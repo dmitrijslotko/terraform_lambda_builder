@@ -20,7 +20,7 @@ data "archive_file" "dependencies" {
 }
 resource "aws_lambda_layer_version" "lambda_layer" {
   filename            = data.archive_file.dependencies.output_path
-  layer_name          = local.stack_prefix
+  layer_name          = local.stack_name
   source_code_hash    = fileexists(data.archive_file.dependencies.output_path) ? filebase64sha256(data.archive_file.dependencies.output_path) : data.archive_file.dependencies.output_base64sha256
   compatible_runtimes = [local.lambda_runtime]
 }
