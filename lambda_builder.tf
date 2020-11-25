@@ -16,7 +16,7 @@ locals {
 data "archive_file" "archive" {
   for_each    = local.lambdas
   type        = "zip"
-  source_dir  = "source_code/lambda_code/${each.key}"
+  source_dir  = "${path.module}/source_code/lambda_code/${each.key}" 
   output_path = ".build/${each.key}.zip"
 }
 

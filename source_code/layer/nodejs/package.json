@@ -1,0 +1,15 @@
+{
+  "name": "normalizing-service",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.20",
+    "uuid": "^8.1.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "2.693.0"
+  }
+}
