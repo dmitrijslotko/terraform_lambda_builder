@@ -23,17 +23,15 @@ resource "aws_iam_role_policy" "permission_policy" {
   role = aws_iam_role.iam_role.id
 
   policy = jsonencode(
-    {
-      "Statement" : [
-        {
-          "Action" : [
-            "s3:*"
-          ],
-          "Resource" : [
-            "*"
-          ],
-          "Effect" : "Allow"
-        }
-      ]
+  {
+    "Statement" : [{
+        "Action" : [
+          "s3:*"
+        ],
+        "Resource" : [
+          "*"
+        ],
+        "Effect" : "Allow"
+    }]
   })
 }
