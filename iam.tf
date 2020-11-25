@@ -34,5 +34,6 @@ resource "aws_iam_role_policy" "permission_policy" {
           ],
           "Effect" : "Allow"
         }
+      ]
   })
 }
