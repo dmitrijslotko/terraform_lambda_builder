@@ -11,8 +11,8 @@ resource "null_resource" "node_dependencies" {
 
 data "archive_file" "dependencies" {
   type        = "zip"
-  source_dir  = "./source_code/layer"
-  output_path = ".build/layer.zip"
+  source_dir  = "${path.module}//source_code/layer"
+  output_path = "${path.module}/.build/layer.zip"
 
   depends_on = [
     null_resource.node_dependencies
