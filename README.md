@@ -30,7 +30,7 @@ For more details please see https://www.terraform.io/docs/modules/sources.html#g
 
 Now you can modify the module.
 
-1. Create a new folder index.js file for a new lambda in the `source_code/lambda_code` directory. Use `lambda_example1` and `lambda_example2` folders as an example.
+1. Create a new folder with index.js file for a new lambda in the `source_code/lambda_code` directory. Use `lambda_example1` and `lambda_example2` folders as an example.
 
 2. Add a new object to locals in `lambda_builder.tf`. Use `lambda_example1` and `lambda_example2` as a reference. If the lambda object is empty like `example1` the lambda parameters will be taken from the `default_params`. Use `lambda_example2` as a reference on how to specify lambda params. Five params are available for modification: timeout, memory, handler, role, and lambda runtime. Since this project is built for NodeJS, it would not work for other runtimes.
 
