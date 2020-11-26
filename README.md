@@ -4,20 +4,10 @@ This project is created to solve one simple problem - deploy AWS Lambdas using T
 
 How it works:
 
-0. Create a module resource and specify the source. Like the example below
-   module "lambda_builder" {
-   source = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v1.0.0"
-   stage = "dev"
-   stack_name = "my_test"
-   }
-   Make sure the version tag is the latest.
+0. Create a module resource and specify the source with the latest version tag. Please pass the "stage" and "stack_name" in the module.
    If ssh key is configured correctly the "terraform init" command will download the module.
-   To have the ability to modify and commit the changes please move the "lambda_builder" folder to the root directory and update the source param like the example below
-   module "lambda_builder" {
-   source = "./lambda_builder"
-   stage = "dev"
-   stack_name = "my_test"
-   }
+   To have the ability to modify and commit the changes please move the "lambda_builder" folder to the root directory and update the source param so it can refer to a local folder from the root directory and not from GitHub. For more details please see https://www.terraform.io/docs/modules/sources.html#github
+
    Now you can modify the module.
 
 1. Create a new folder index.js file for a new lambda in the "source_code/lambda_code" directory. Please use "lambda_example1" and "lambda_example2" folders as an example.
