@@ -8,9 +8,9 @@ This project is created to solve one simple problem - deploy AWS Lambdas using T
 
 ```hcl
    module "lambda_builder" {
-    source = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v1.0.0"
-    stage = "dev"
-    stack_name = "my_test"
+      source = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v1.0.0"
+      stage = "dev"
+      stack_name = "my_test"
    }
 ```
 
@@ -20,9 +20,9 @@ To have the ability to modify and commit the changes please move the "lambda_bui
 
 ```hcl
 module "lambda_builder" {
-    source = "./lambda_builder"
-    stage = "dev"
-    stack_name = "my_test"
+   source = "./lambda_builder"
+   stage = "dev"
+   stack_name = "my_test"
 }
 ```
 
