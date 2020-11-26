@@ -1,2 +1,2 @@
-variable "stack_name"{}
-variable "stage"{}
+variable "stack_name" {}
+variable "stage" {}

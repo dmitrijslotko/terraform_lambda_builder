@@ -23,8 +23,8 @@ resource "aws_iam_role_policy" "permission_policy" {
   role = aws_iam_role.iam_role.id
 
   policy = jsonencode(
-  {
-    "Statement" : [{
+    {
+      "Statement" : [{
         "Action" : [
           "s3:GetObject"
         ],
@@ -32,7 +32,7 @@ resource "aws_iam_role_policy" "permission_policy" {
           "*"
         ],
         "Effect" : "Allow"
-    }]
+      }]
   })
 }
 
