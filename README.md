@@ -19,11 +19,11 @@ If ssh key is configured correctly the "terraform init" command will download th
 To have the ability to modify and commit the changes please move the "lambda_builder" folder to the root directory and update the source param like the example below
 
 ```hcl
-module "lambda_builder" {
-   source = "./lambda_builder"
-   stage = "dev"
-   stack_name = "my_test"
-}
+   module "lambda_builder" {
+      source = "./lambda_builder"
+      stage = "dev"
+      stack_name = "my_test"
+   }
 ```
 
 For more details please see https://www.terraform.io/docs/modules/sources.html#github
