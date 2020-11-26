@@ -27,6 +27,7 @@ To have the ability to modify and commit the changes please move the `lambda_bui
 ```
 
 For more details please see https://www.terraform.io/docs/modules/sources.html#github
+
 Now you can modify the module.
 
 1. Create a new folder index.js file for a new lambda in the `source_code/lambda_code` directory. Please use `lambda_example1` and `lambda_example2` folders as an example.
