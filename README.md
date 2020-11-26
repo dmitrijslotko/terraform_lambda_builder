@@ -41,15 +41,3 @@ Now you can modify the module.
 ## Notes:
 
 The AWS Lambda Layer is updating when the checksum of its zip file changes. It means any change in "source_code/layer/" will trigger a new version. In some cases, you can face the error "Error: Provider produced inconsistent final plan". It is a bug in terraform and usually, another deployment attempt will fix the issue.
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
