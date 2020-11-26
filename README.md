@@ -2,14 +2,17 @@
 
 This project is created to solve one simple problem - deploy AWS Lambdas using Terraform.
 
-How it works: 0) Create a module resource and specify the source. Like the example below
+How it works:
+
+0. Create a module resource and specify the source. Like the example below
 
 module "lambda_builder" {
-source = "git@github.com:dmitrijslotko/terraform_lambda_builder.git"
+source = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v1.0.0"
 stage = "dev"
 stack_name = "my_test"
 }
 
+Make sure the version tag is the latest.
 If ssh key is configured correctly the "terraform init" command will download the module.
 
 To have the ability to modify and commit the changes please move the "lambda_builder" folder to the root directory and update the source param like the example below
