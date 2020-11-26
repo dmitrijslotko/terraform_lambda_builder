@@ -21,6 +21,6 @@ data "archive_file" "dependencies" {
 resource "aws_lambda_layer_version" "lambda_layer" {
   filename            = data.archive_file.dependencies.output_path
   layer_name          = local.stack_name
-  source_code_hash    = data.archive_file.dependencies.output_base64sha256
+  source_code_hash    = filebase64sha256(data.archive_file.dependencies.output_path)
   compatible_runtimes = [local.lambda_runtime]
 }

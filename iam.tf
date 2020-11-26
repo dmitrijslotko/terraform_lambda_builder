@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "permission_policy" {
   {
     "Statement" : [{
         "Action" : [
-          "s3:*"
+          "s3:GetObject"
         ],
         "Resource" : [
           "*"
@@ -34,4 +34,9 @@ resource "aws_iam_role_policy" "permission_policy" {
         "Effect" : "Allow"
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "AWSLambdaBasicExecutionRole" {
+  role       = aws_iam_role.iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
