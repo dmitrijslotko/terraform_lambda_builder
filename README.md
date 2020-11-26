@@ -1,8 +1,8 @@
-# terraform_lambda_builder
+## terraform_lambda_builder
 
 This project is created to solve one simple problem - deploy AWS Lambdas using Terraform.
 
-How it works:
+## How it works:
 
 0. Create a module resource and specify the source with the latest version tag. Please pass the "stage" and "stack_name" in the module.
 
@@ -38,7 +38,7 @@ Now you can modify the module.
 
 5. Deploy and enjoy the result.
 
-Notes:
+## Notes:
 
 The AWS Lambda Layer is updating when the checksum of its zip file changes. It means any change in "source_code/layer/" will trigger a new version. In some cases, you can face the error "Error: Provider produced inconsistent final plan". It is a bug in terraform and usually, another deployment attempt will fix the issue.
 
