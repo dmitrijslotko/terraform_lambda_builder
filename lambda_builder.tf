@@ -19,7 +19,7 @@ locals {
 data "archive_file" "archive" {
   for_each    = local.lambdas
   type        = "zip"
-  source_dir  = "${path.module}/source_code/lambda_code/${each.key}"
+  source_dir  = "${path.module}/lambda_code/${each.key}"
   output_path = "${path.module}/.build/${each.key}.zip"
 }
 
@@ -37,7 +37,9 @@ resource "aws_lambda_function" "lambdas" {
 
   environment {
     variables = {
-      stage = local.stage
+      stage                      = local.stage
+      NODE_ENV                   = "aws"
+      SUPPRESS_NO_CONFIG_WARNING = "y"
     }
   }
 }
