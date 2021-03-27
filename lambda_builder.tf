@@ -43,3 +43,9 @@ resource "aws_lambda_function" "lambdas" {
     }
   }
 }
+
+resource "aws_cloudwatch_log_group" "log" {
+  for_each          = local.lambdas
+  name              = "/aws/lambda/${each.key}"
+  retention_in_days = 14
+}
