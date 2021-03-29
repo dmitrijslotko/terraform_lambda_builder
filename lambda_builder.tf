@@ -37,9 +37,8 @@ resource "aws_lambda_function" "lambdas" {
 
   environment {
     variables = {
-      stage                      = local.stage
-      NODE_ENV                   = "aws"
-      SUPPRESS_NO_CONFIG_WARNING = "y"
+      stage = local.stage
+      lambda_prefix = "/opt/nodejs/"
     }
   }
 }
@@ -47,10 +46,5 @@ resource "aws_lambda_function" "lambdas" {
 resource "aws_cloudwatch_log_group" "log" {
   for_each          = local.lambdas
   name              = "/aws/lambda/${each.key}"
-  retention_in_days = 14
-}
-
-resource "aws_iam_role_policy_attachment" "AWSLambdaBasicExecutionRole" {
-  role       = aws_iam_role.iam_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  retention_in_days = 30
 }
