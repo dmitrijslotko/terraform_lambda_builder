@@ -37,7 +37,7 @@ resource "aws_lambda_function" "lambdas" {
 
   environment {
     variables = {
-      stage = local.stage
+      stage         = local.stage
       lambda_prefix = "/opt/nodejs/"
     }
   }
@@ -45,6 +45,6 @@ resource "aws_lambda_function" "lambdas" {
 
 resource "aws_cloudwatch_log_group" "log" {
   for_each          = local.lambdas
-  name              = "/aws/lambda/${each.key}"
+  name              = "/aws/lambda/${each.key}-${local.stack_name}"
   retention_in_days = 30
 }
