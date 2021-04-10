@@ -29,3 +29,4 @@ override.tf.json
 # example: *tfplan*
 node_modules
 lambda_code/layer/nodejs/*.json
+coverage

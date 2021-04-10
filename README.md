@@ -1,10 +1,10 @@
 ## terraform_lambda_builder
 
-This project is created to solve one simple problem - deployment of AWS Lambdas using Terraform.   
+This project is created to solve one simple problem - deployment of AWS Lambdas using Terraform.
 
 ## How it works:
 
-0. Create a module resource and specify the source with the latest version tag. Specify the `stage` and `stack_name` in the module.
+0. Create a module resource and specify the source with the latest version tag. Drag `jest` folder to the root directory. Drag `package.json` to the root directory or copy dipendencies to the existing `package.json` file. To use local enviroment variables for testing use `setEnvVars.js` in `jest` folder. Specify the `stage` and `stack_name` in the module.
 
 ```hcl
    module "lambda_builder" {

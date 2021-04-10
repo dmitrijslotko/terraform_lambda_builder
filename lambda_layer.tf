@@ -1,6 +1,6 @@
 resource "null_resource" "node_dependencies" {
   provisioner "local-exec" {
-    command = "jest --silent --collectCoverage --colors"
+    command = "npm test"
   }
   provisioner "local-exec" {
     command = "copy package.json ${local.nodejs_windows_path}\\package.json /y"
