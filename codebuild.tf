@@ -37,11 +37,13 @@ resource "null_resource" "codebuild_status_check" {
   provisioner "local-exec" {
     working_dir = path.module
     command     = "aws codebuild list-builds-for-project --project-name ${var.function_name} --max-items 1 > project_builds_${var.function_name}.json"
+    on_failure  = continue
   }
 
   provisioner "local-exec" {
     working_dir = path.module
     command     = "aws codebuild batch-get-builds --ids ${try(jsondecode(file("${path.module}/project_builds_${var.function_name}.json")).ids[0], "${var.function_name}:${random_uuid.random.id}")} > last_build_result_${var.function_name}.json"
+    on_failure  = continue
   }
 
   triggers = {
