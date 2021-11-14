@@ -2,7 +2,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "service_role" {
-  count = local.count
+  count = local.docker_lambda_count
   name  = "${var.function_name}_service_role"
 
   assume_role_policy = <<EOF
@@ -22,7 +22,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "service_policy" {
-  count  = local.count
+  count  = local.docker_lambda_count
   role   = aws_iam_role.service_role[count.index].name
   policy = <<POLICY
 {
@@ -46,8 +46,8 @@ resource "aws_iam_role_policy" "service_policy" {
         "s3:GetObjectVersion"
       ],
       "Resource": [
-        "arn:aws:s3:::${local.artifact_bucket}",
-        "arn:aws:s3:::${local.artifact_bucket}/*"
+        "arn:aws:s3:::${var.artifact_bucket}",
+        "arn:aws:s3:::${var.artifact_bucket}/*"
       ]
     },
     {

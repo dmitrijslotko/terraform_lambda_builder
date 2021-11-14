@@ -1,13 +1,9 @@
 resource "aws_codebuild_project" "project" {
-  count         = local.count
+  count         = local.docker_lambda_count
   name          = var.function_name
   description   = "automated docker build"
-  build_timeout = var.lambda_memory < 1 ? var.default_build_timeout : var.build_timeout
+  build_timeout = var.build_timeout
   service_role  = aws_iam_role.service_role[count.index].arn
-  tags = merge(
-    local.default_tags,
-    var.tags
-  )
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
@@ -23,7 +19,7 @@ resource "aws_codebuild_project" "project" {
 
   source {
     type     = "S3"
-    location = "${local.artifact_bucket}/${local.artifact_path}/${local.docker_artifact}"
+    location = "${var.artifact_bucket}/${var.artifact_path}/${local.docker_artifact}"
   }
 
   artifacts {
@@ -32,7 +28,7 @@ resource "aws_codebuild_project" "project" {
 }
 
 resource "null_resource" "codebuild_status_check" {
-  count = local.count
+  count = local.docker_lambda_count
 
   provisioner "local-exec" {
     working_dir = path.module
@@ -52,7 +48,7 @@ resource "null_resource" "codebuild_status_check" {
 }
 
 resource "null_resource" "codebuild_start" {
-  count = local.count
+  count = local.docker_lambda_count
   triggers = {
     status = try("${jsondecode(file("${path.module}/last_build_result_${var.function_name}.json")).builds[0].buildStatus}" == "SUCCEEDED" ? "no_build" : timestamp(), timestamp())
     etag   = aws_s3_bucket_object.docker_artifact[count.index].etag
