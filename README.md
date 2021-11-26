@@ -1,10 +1,10 @@
-## Mandatory variables
+## Mandatory Variables
 
 `function_name` is for name of a lambda function.
 
 `file_name` is for path to a source code.
 
-## Optional variables
+## Optional Variables
 
 `lambda_runtime` - default value is `nodejs14.x`.
 
@@ -24,7 +24,7 @@
 
 `layers` - by default no layers are added.
 
-## VPC variables
+## VPC Variables
 
 To deploy lambda in a VPC use the following fields.
 
@@ -32,7 +32,7 @@ To deploy lambda in a VPC use the following fields.
 
 `security_group_ids` - is a list of security group ids. By default is null.
 
-## EFS variables
+## EFS Variables
 
 To add an EFS volume to a lambda use the following fields. Please note lambda should be deployed in a VPC to make EFS work.
 
@@ -42,7 +42,7 @@ To add an EFS volume to a lambda use the following fields. Please note lambda sh
 
 `local_mount_path` - default values is `/mnt/efs`. Local mount path should start from /mnt/
 
-## Variables for Image lambdas
+## Variables for Image Lambdas
 
 `build_timeout` - default value is `10` minutes.
 
@@ -57,16 +57,14 @@ To add an EFS volume to a lambda use the following fields. Please note lambda sh
 Assuming:
 
 - you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has `handler` as a main function name.
 
 ```hcl
    root_directory/
    |── lambda_1/
       |── index.js
 ```
-
-then the module definition can have only mandatory variables.
-`function_name` is for name of a lambda function.
-`file_name` is for path to a source code. By default handler is `index.handler` it means the js file with the main function should have `index.js` name and the exported function should have the name `handler`.
 
 ```hcl
 module "my_test_lambda" {
@@ -76,4 +74,28 @@ module "my_test_lambda" {
 }
 ```
 
-The outcome of the module will be four resources: iam role, iam role policy (with basic permissions), lambda function, log group (with 30 days retantion period) 0. Create a module resource and specify the source with the latest version tag. Specify the `stage` and `stack_name` in the module.
+## Example #2 - lambda function with additional parameters
+
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has `handler` as a main function name.
+
+```hcl
+   root_directory/
+   |── source_code/
+      |── lambda_1/
+         |── index.js
+```
+
+```hcl
+module "my_test_lambda" {
+  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  function_name                    = "my_test_lambda"
+  file_name                        = "./source_code/lambda_1"
+  enviroment_variables             = { Application : "demo_project", stage : "dev" }
+  lambda_memory                    = 512
+  lambda_timeout                   = 60
+  cloudwatch_log_retention_in_days = 7
+  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
+}
+```
