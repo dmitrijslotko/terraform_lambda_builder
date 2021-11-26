@@ -18,8 +18,9 @@ resource "aws_codebuild_project" "project" {
   }
 
   source {
-    type     = "S3"
-    location = "${var.artifact_bucket}/${var.artifact_path}/${local.docker_artifact}"
+    type      = "S3"
+    location  = "${var.artifact_bucket}/${var.artifact_path}/${local.docker_artifact}"
+    buildspec = fileexists("${var.file_name}/buildspec.yml") ? null : "${file("${path.module}/buildspec.yml")}"
   }
 
   artifacts {

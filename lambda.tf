@@ -16,7 +16,7 @@ resource "aws_lambda_function" "lambda" {
   }
 
   dynamic "vpc_config" {
-    for_each = toset(var.subnet_ids == null ? [] : ["a sigle element to trigger the block"])
+    for_each = var.subnet_ids == null ? [] : ["a sigle element to trigger the block"]
     content {
       subnet_ids         = var.subnet_ids
       security_group_ids = var.security_group_ids
@@ -24,7 +24,7 @@ resource "aws_lambda_function" "lambda" {
   }
 
   dynamic "file_system_config" {
-    for_each = toset(var.add_efs == false ? var.efs_access_point == null ? [] : [var.efs_access_point] : [var.add_efs])
+    for_each = var.add_efs == false ? var.efs_access_point == null ? [] : [var.efs_access_point] : [var.add_efs]
     content {
       # Every subnet should be able to reach an EFS mount target in the same Availability Zone. Cross-AZ mounts are not permitted.
       # Local mount path inside the lambda function. Must start with '/mnt/'.

@@ -1,3 +1,20 @@
+# ================ mandatory variables ================
+
+variable "function_name" {
+  type = string
+  validation {
+    condition     = length(var.function_name) <= 64
+    error_message = "The name of the Lambda function, up to 64 characters in length."
+  }
+}
+
+variable "file_name" {
+  type = string
+    description = "The name of a lambda function. Also this name will be used as a part of other part"
+}
+
+# ================ optional variables ================
+
 variable "lambda_runtime" {
   type    = string
   default = "nodejs14.x"
@@ -33,18 +50,6 @@ variable "lambda_role" {
   default = null
 }
 
-variable "function_name" {
-  type = string
-  validation {
-    condition     = length(var.function_name) <= 64
-    error_message = "The name of the Lambda function, up to 64 characters in length."
-  }
-}
-
-variable "file_name" {
-  type = string
-}
-
 variable "cloudwatch_log_retention_in_days" {
   type    = number
   default = 30
@@ -67,6 +72,20 @@ variable "layers" {
   default = [""]
 }
 
+# ================ mandatory variables for vpc config ================
+
+variable "subnet_ids" {
+  type    = list(string)
+  default = null
+}
+
+variable "security_group_ids" {
+  type    = list(string)
+  default = null
+}
+
+# ================ variables for docker lambda ================
+
 variable "image_count" {
   type    = number
   default = 5
@@ -87,15 +106,7 @@ variable "build_timeout" {
   default = 10
 }
 
-variable "subnet_ids" {
-  type    = list(string)
-  default = null
-}
-
-variable "security_group_ids" {
-  type    = list(string)
-  default = null
-}
+# ================ variables for efs ================
 
 variable "efs_access_point" {
   type    = string
