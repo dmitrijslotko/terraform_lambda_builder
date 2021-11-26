@@ -1,4 +1,4 @@
-# ================ mandatory variables ================
+# ========== Mandatory fields ==========
 
 variable "function_name" {
   type = string
@@ -10,10 +10,11 @@ variable "function_name" {
 
 variable "file_name" {
   type = string
-    description = "The name of a lambda function. Also this name will be used as a part of other part"
 }
 
-# ================ optional variables ================
+# ========== Mandatory fields ==========
+
+# ========== Optional fields ==========
 
 variable "lambda_runtime" {
   type    = string
@@ -23,7 +24,6 @@ variable "lambda_runtime" {
 variable "lambda_memory" {
   type    = number
   default = 256
-
   validation {
     condition     = var.lambda_memory >= 256 || var.lambda_memory <= 10240
     error_message = "Lambda memory should be between 256 and 10240."
@@ -72,7 +72,9 @@ variable "layers" {
   default = [""]
 }
 
-# ================ mandatory variables for vpc config ================
+# ========== Optional fields ==========
+
+# ========== VPC related fields ==========
 
 variable "subnet_ids" {
   type    = list(string)
@@ -84,8 +86,28 @@ variable "security_group_ids" {
   default = null
 }
 
-# ================ variables for docker lambda ================
+# ========== VPC related fields ==========
 
+# ========== EFS related fields ==========
+
+variable "efs_access_point" {
+  type    = string
+  default = null
+}
+
+variable "local_mount_path" {
+  type    = string
+  default = "/mnt/efs"
+}
+
+variable "add_efs" {
+  type    = bool
+  default = false
+}
+
+# ========== EFS related fields ==========
+
+# ========== Image lambda fields ==========
 variable "image_count" {
   type    = number
   default = 5
@@ -106,19 +128,8 @@ variable "build_timeout" {
   default = 10
 }
 
-# ================ variables for efs ================
+# ========== Image lambda fields ==========
 
-variable "efs_access_point" {
-  type    = string
-  default = null
-}
 
-variable "local_mount_path" {
-  type    = string
-  default = "/mnt/efs"
-}
 
-variable "add_efs" {
-  type    = bool
-  default = false
-}
+
