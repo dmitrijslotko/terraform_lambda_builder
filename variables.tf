@@ -16,6 +16,11 @@ variable "file_name" {
 
 # ========== Optional fields ==========
 
+variable "create_lambda_role" {
+  type    = bool
+  default = false
+}
+
 variable "lambda_runtime" {
   type    = string
   default = "nodejs14.x"

@@ -3,7 +3,7 @@ resource "aws_lambda_function" "lambda" {
   image_uri                      = local.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
   function_name                  = var.function_name
   source_code_hash               = data.archive_file.archive.output_base64sha256
-  role                           = var.lambda_role == null ? aws_iam_role.lambda_builder_iam_role[0].arn : var.lambda_role
+  role                           = var.create_lambda_role ? aws_iam_role.lambda_builder_iam_role[0].arn : var.lambda_role
   handler                        = local.is_docker_lambda ? null : var.lambda_handler
   timeout                        = var.lambda_timeout
   runtime                        = local.is_docker_lambda ? null : var.lambda_runtime

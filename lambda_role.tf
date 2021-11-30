@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  count = var.lambda_role == null ? 1 : 0
+  count = var.create_lambda_role == null ? 1 : 0
   name  = "${var.function_name}_role"
   assume_role_policy = jsonencode(
     {
@@ -20,7 +20,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_builder_permission_policy" {
-  count = var.lambda_role == null ? 1 : 0
+  count = var.create_lambda_role == null ? 1 : 0
   name  = "${var.function_name}_policy"
   role  = aws_iam_role.lambda_builder_iam_role[count.index].id
 

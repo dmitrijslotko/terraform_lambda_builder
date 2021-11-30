@@ -6,6 +6,8 @@
 
 ## Optional Variables
 
+`create_lambda_role` - default values is false. If it is ntrue than the module will create a role with basic permissions.
+
 `lambda_runtime` - default value is `nodejs14.x`.
 
 `lambda_memory` - default value is `256`.
@@ -14,7 +16,7 @@
 
 `lambda_handler` - default value is `index.handler`. `index` is for main file name `index.js`. `handler` is main exported function name.
 
-`lambda_role` - if it is not passed in module than the module will create a role with basic permissions.
+`lambda_role` - role for a lambda function.
 
 `cloudwatch_log_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
 
