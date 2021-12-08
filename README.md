@@ -6,8 +6,6 @@
 
 ## Optional Variables
 
-`create_lambda_role` - default values is false. If it is ntrue than the module will create a role with basic permissions.
-
 `lambda_runtime` - default value is `nodejs14.x`.
 
 `lambda_memory` - default value is `256`.
@@ -16,7 +14,7 @@
 
 `lambda_handler` - default value is `index.handler`. `index` is for main file name `index.js`. `handler` is main exported function name.
 
-`lambda_role` - role for a lambda function.
+`policy_arn` - policy arn for an iam role.
 
 `cloudwatch_log_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
 
@@ -93,14 +91,14 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name                    = "my_test_lambda"
   file_name                        = "./source_code/lambda_1"
   enviroment_variables             = { Application : "demo_project", stage : "dev" }
   lambda_memory                    = 512
   lambda_timeout                   = 60
   cloudwatch_log_retention_in_days = 7
-  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
+  policy_arn                       = aws_iam_policy.policy.arn
 }
 ```
 
@@ -133,14 +131,14 @@ Assuming:
 ```hcl
 module "my_test_lambda" {
   for_each                         = toset(["lambda_1", "lambda_2"])
-  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name                    = each.value
   file_name                        = "./source_code/${each.value}"
   enviroment_variables             = { Application : "demo_project", stage : "dev" }
   lambda_memory                    = 512
   lambda_timeout                   = 60
   cloudwatch_log_retention_in_days = 7
-  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
+  policy_arn                       = aws_iam_policy.policy.arn
 }
 ```
 
@@ -168,12 +166,12 @@ Assuming:
 ```hcl
 module "my_test_lambda" {
   for_each             = local.lambda_params
-  source               = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source               = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name        = each.key
   file_name            = "./source_code/${each.key}"
   lambda_memory        = try(each.value.lambda_memory, 128)
   lambda_timeout       = try(each.value.lambda_timeout, 60)
-  lambda_role          = try(each.value.lambda_role, null)
+  policy_arn           = try(each.value.policy_arn, null)
   enviroment_variables = try(each.value.enviroment_variables, null)
 }
 
@@ -186,7 +184,7 @@ locals {
     }
     lambda_2 = {
       lambda_timeout = 30
-      lambda_role    = aws_iam_role.lambda_builder_iam_role.arn
+      policy_arn     = aws_iam_policy.policy.arn
     }
   }
 }
@@ -213,7 +211,7 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
@@ -242,7 +240,7 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
@@ -274,7 +272,7 @@ Assuming:
 ```hcl
 module "my_test_lambda" {
   for_each           = toset(["lambda_1", "lambda_2"])
-  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = each.value
   file_name          = "./source_code/${each.value}"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]

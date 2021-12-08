@@ -16,9 +16,9 @@ variable "file_name" {
 
 # ========== Optional fields ==========
 
-variable "create_lambda_role" {
-  type    = bool
-  default = false
+variable "policy_arn" {
+  type    = string
+  default = null
 }
 
 variable "lambda_runtime" {
@@ -50,21 +50,14 @@ variable "lambda_handler" {
   default = "index.handler"
 }
 
-variable "lambda_role" {
-  type    = string
-  default = null
-}
-
 variable "cloudwatch_log_retention_in_days" {
   type    = number
   default = 30
 }
 
 variable "enviroment_variables" {
-  type = map(string)
-  default = {
-    layer_prefix = "/opt/nodejs/"
-  }
+  type    = map(string)
+  default = null
 }
 
 variable "reserved_concurrent_executions" {

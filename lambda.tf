@@ -3,7 +3,7 @@ resource "aws_lambda_function" "lambda" {
   image_uri                      = local.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
   function_name                  = var.function_name
   source_code_hash               = data.archive_file.archive.output_base64sha256
-  role                           = var.create_lambda_role ? aws_iam_role.lambda_builder_iam_role[0].arn : var.lambda_role
+  role                           = aws_iam_role.lambda_builder_iam_role.arn
   handler                        = local.is_docker_lambda ? null : var.lambda_handler
   timeout                        = var.lambda_timeout
   runtime                        = local.is_docker_lambda ? null : var.lambda_runtime
@@ -11,8 +11,12 @@ resource "aws_lambda_function" "lambda" {
   package_type                   = local.is_docker_lambda ? "Image" : "Zip"
   layers                         = local.is_docker_lambda ? null : var.layers
   reserved_concurrent_executions = var.reserved_concurrent_executions
-  environment {
-    variables = var.enviroment_variables
+
+  dynamic "environment" {
+    for_each = var.enviroment_variables == null ? [] : ["a sigle element to trigger the block"]
+    content {
+      variables = var.enviroment_variables
+    }
   }
 
   dynamic "vpc_config" {
