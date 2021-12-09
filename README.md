@@ -67,7 +67,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   source        = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name = "my_test_lambda"
   file_name     = "./lambda_1"
@@ -90,7 +90,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name                    = "my_test_lambda"
   file_name                        = "./source_code/lambda_1"
@@ -104,11 +104,11 @@ module "my_test_lambda" {
 
 To get to the variables of the created lambda function like arn or invoke_arn it is possible to use the output of a module. It will output the aws_lambda_function object. So to get the arn or invoke_arn in this example you can use:
 
-module.my_test_lambda.lambda_output.arn
+module.lambda_function.lambda_output.arn
 
 or
 
-module.my_test_lambda.lambda_output.invoke_arn
+module.lambda_function.lambda_output.invoke_arn
 
 ## Example #3 - Create Multiple Lambda Functions in a Loop
 
@@ -129,7 +129,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   for_each                         = toset(["lambda_1", "lambda_2"])
   source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name                    = each.value
@@ -142,7 +142,7 @@ module "my_test_lambda" {
 }
 ```
 
-To get the first lambda object in this example please use `module.my_test_lambda["lambda_1"].lambda_output` or if you need the second object than use `module.my_test_lambda["lambda_2"].lambda_output`. To get the arn of a second lambda use `module.my_test_lambda["lambda_2"].lambda_output.arn`
+To get the first lambda object in this example please use `module.lambda_function["lambda_1"].lambda_output` or if you need the second object than use `module.lambda_function["lambda_2"].lambda_output`. To get the arn of a second lambda use `module.lambda_function["lambda_2"].lambda_output.arn`
 
 ## Example #4 - Create Multiple Lambda Functions in a Loop with Different Parameters
 
@@ -164,7 +164,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   for_each             = local.lambda_params
   source               = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name        = each.key
@@ -210,7 +210,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
@@ -239,7 +239,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
@@ -253,9 +253,9 @@ module "my_test_lambda" {
 
 Assuming:
 
-- you have a folder with code of a lambda function located in the root directory.
-- file name is `index.js`
-- it has a `handler` as a main function name.
+- you have a folder with code of the lambda functionы located in the root directory.
+- each file name is `index.js`.
+- each file has a `handler` as a main function name.
 - subnets are previosly created.
 - security groups are previosly created.
 - efs volume is previosly created
@@ -270,7 +270,7 @@ Assuming:
 ```
 
 ```hcl
-module "my_test_lambda" {
+module "lambda_function" {
   for_each           = toset(["lambda_1", "lambda_2"])
   source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = each.value
@@ -278,5 +278,43 @@ module "my_test_lambda" {
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
   security_group_ids = ["sg-00112233"]
   efs_access_point   = aws_efs_access_point.access_point_for_lambda.arn
+}
+```
+
+## Example #7 - Share NPM Modules and Helper Methods Between Two Lambda Functions
+
+Assuming:
+
+- you have a folder with code of the lambda functionы located in the root directory.
+- each file name is `index.js`.
+- each file has a `handler` as a main function name.
+- you have folder `layer` with folder `nodejs` inside it.
+
+```hcl
+   root_directory/
+   |── source_code/
+      |── lambda_1/
+         |── index.js
+      |── lambda_2/
+         |── index.js
+   |── layer/
+      |── nodejs/
+         |── helper_methods.js
+         |── package.json
+```
+
+```hcl
+module "lambda_function" {
+  for_each           = toset(["lambda_1", "lambda_2"])
+  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name      = each.value
+  file_name          = "./source_code/${each.value}"
+  layers             = [module.lambda_layer.layer_output.arn]
+}
+
+module "lambda_layer" {
+  source          = "github.com/dmitrijslotko/terraform_layer_builder.git?ref=latest"
+  layer_name      = "my_layer"
+  layer_directory = "./layer"
 }
 ```
