@@ -20,7 +20,7 @@ resource "aws_codebuild_project" "project" {
   source {
     type      = "S3"
     location  = "${var.artifact_bucket}/${var.artifact_path}/${local.docker_artifact}"
-    buildspec = fileexists("${var.file_name}/buildspec.yml") ? null : "${file("${path.module}/buildspec.yml")}"
+    buildspec = var.is_docker_lambda && var.use_default_buildspec ? file("${path.module}/buildspec.yml") : file("${var.file_name}/buildspec.yml")
   }
 
   artifacts {
@@ -28,31 +28,16 @@ resource "aws_codebuild_project" "project" {
   }
 }
 
-resource "null_resource" "codebuild_status_check" {
-  count = local.docker_lambda_count
-
-  provisioner "local-exec" {
-    working_dir = path.module
-    command     = "aws codebuild list-builds-for-project --project-name ${var.function_name} --max-items 1 > project_builds_${var.function_name}.json"
-    on_failure  = continue
-  }
-
-  provisioner "local-exec" {
-    working_dir = path.module
-    command     = "aws codebuild batch-get-builds --ids ${try(jsondecode(file("${path.module}/project_builds_${var.function_name}.json")).ids[0], "${var.function_name}:${random_uuid.random.id}")} > last_build_result_${var.function_name}.json"
-    on_failure  = continue
-  }
-
-  triggers = {
-    etag = timestamp()
-  }
+resource "local_file" "copy_default_buildspec" {
+  count    = var.is_docker_lambda && var.use_default_dockerfile ? 1 : 0
+  content  = file("${path.module}/Dockerfile")
+  filename = "${var.file_name}/Dockerfile"
 }
 
 resource "null_resource" "codebuild_start" {
   count = local.docker_lambda_count
   triggers = {
-    status = try("${jsondecode(file("${path.module}/last_build_result_${var.function_name}.json")).builds[0].buildStatus}" == "SUCCEEDED" ? "no_build" : timestamp(), timestamp())
-    etag   = aws_s3_bucket_object.docker_artifact[count.index].etag
+    etag = aws_s3_bucket_object.docker_artifact[count.index].etag
   }
 
   provisioner "local-exec" {
@@ -62,13 +47,13 @@ resource "null_resource" "codebuild_start" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "node codebuild_launch.js ${var.function_name} ${local.region} "
+    command     = "node codebuild_launch.js ${var.function_name} ${local.region}"
+    on_failure  = fail
   }
 
   depends_on = [
     aws_codebuild_project.project[0],
     aws_ecr_repository.ecr[0],
-    null_resource.codebuild_status_check[0]
   ]
 }
 

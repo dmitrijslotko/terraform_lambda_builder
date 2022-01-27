@@ -1,6 +1,5 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  count = var.create_lambda_role ? 1 : 0
-  name  = "${var.function_name}_role"
+  name = "${var.function_name}_role"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -17,29 +16,52 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
         }
       ]
   })
-}
 
-resource "aws_iam_role_policy" "lambda_builder_permission_policy" {
-  count = var.create_lambda_role ? 1 : 0
-  name  = "${var.function_name}_policy"
-  role  = aws_iam_role.lambda_builder_iam_role[count.index].id
+  inline_policy {
+    name = "cloudwatch_logs"
 
-  policy = jsonencode(
-    {
-      "Statement" : [{
-        "Action" : [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Resource" : "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.log.name}:*",
-        "Effect" : "Allow"
-      }]
-  })
-}
+    policy = jsonencode(
+      {
+        "Statement" : [{
+          "Action" : [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.log.name}:*",
+          "Effect" : "Allow"
+        }]
+    })
+  }
 
+  dynamic "inline_policy" {
+    for_each = var.subnet_ids == null ? [] : ["a sigle element to trigger the block"]
+    content {
+      name = "vpc_access_execution_role"
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:UnassignPrivateIpAddresses"
+              ],
+              "Resource" : "*"
+            }
+          ]
+      })
+    }
+  }
 
-resource "aws_iam_role_policy_attachment" "AWSLambdaVPCAccessExecutionRole" {
-  count      = var.subnet_ids == null ? 0 : 1
-  role       = aws_iam_role.lambda_builder_iam_role[count.index].id
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  dynamic "inline_policy" {
+    for_each = var.subnet_ids == null ? [] : ["a sigle element to trigger the block"]
+    content {
+      name   = "additional_policy"
+      policy = var.role_policy
+    }
+  }
 }

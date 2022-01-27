@@ -6,6 +6,8 @@
 
 ## Optional Variables
 
+`create_lambda_role` - default values is false. If it is ntrue than the module will create a role with basic permissions.
+
 `lambda_runtime` - default value is `nodejs14.x`.
 
 `lambda_memory` - default value is `256`.
@@ -14,7 +16,7 @@
 
 `lambda_handler` - default value is `index.handler`. `index` is for main file name `index.js`. `handler` is main exported function name.
 
-`policy_arn` - policy arn for an iam role.
+`lambda_role` - role for a lambda function.
 
 `cloudwatch_log_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
 
@@ -67,7 +69,7 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
+module "my_test_lambda" {
   source        = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name = "my_test_lambda"
   file_name     = "./lambda_1"
@@ -90,25 +92,25 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
-  source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+module "my_test_lambda" {
+  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name                    = "my_test_lambda"
   file_name                        = "./source_code/lambda_1"
   enviroment_variables             = { Application : "demo_project", stage : "dev" }
   lambda_memory                    = 512
   lambda_timeout                   = 60
   cloudwatch_log_retention_in_days = 7
-  policy_arn                       = aws_iam_policy.policy.arn
+  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
 To get to the variables of the created lambda function like arn or invoke_arn it is possible to use the output of a module. It will output the aws_lambda_function object. So to get the arn or invoke_arn in this example you can use:
 
-module.lambda_function.lambda_output.arn
+module.my_test_lambda.lambda_output.arn
 
 or
 
-module.lambda_function.lambda_output.invoke_arn
+module.my_test_lambda.lambda_output.invoke_arn
 
 ## Example #3 - Create Multiple Lambda Functions in a Loop
 
@@ -129,20 +131,20 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
+module "my_test_lambda" {
   for_each                         = toset(["lambda_1", "lambda_2"])
-  source                           = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name                    = each.value
   file_name                        = "./source_code/${each.value}"
   enviroment_variables             = { Application : "demo_project", stage : "dev" }
   lambda_memory                    = 512
   lambda_timeout                   = 60
   cloudwatch_log_retention_in_days = 7
-  policy_arn                       = aws_iam_policy.policy.arn
+  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
-To get the first lambda object in this example please use `module.lambda_function["lambda_1"].lambda_output` or if you need the second object than use `module.lambda_function["lambda_2"].lambda_output`. To get the arn of a second lambda use `module.lambda_function["lambda_2"].lambda_output.arn`
+To get the first lambda object in this example please use `module.my_test_lambda["lambda_1"].lambda_output` or if you need the second object than use `module.my_test_lambda["lambda_2"].lambda_output`. To get the arn of a second lambda use `module.my_test_lambda["lambda_2"].lambda_output.arn`
 
 ## Example #4 - Create Multiple Lambda Functions in a Loop with Different Parameters
 
@@ -164,14 +166,14 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
+module "my_test_lambda" {
   for_each             = local.lambda_params
-  source               = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  source               = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name        = each.key
   file_name            = "./source_code/${each.key}"
   lambda_memory        = try(each.value.lambda_memory, 128)
   lambda_timeout       = try(each.value.lambda_timeout, 60)
-  policy_arn           = try(each.value.policy_arn, null)
+  lambda_role          = try(each.value.lambda_role, null)
   enviroment_variables = try(each.value.enviroment_variables, null)
 }
 
@@ -184,7 +186,7 @@ locals {
     }
     lambda_2 = {
       lambda_timeout = 30
-      policy_arn     = aws_iam_policy.policy.arn
+      lambda_role    = aws_iam_role.lambda_builder_iam_role.arn
     }
   }
 }
@@ -210,8 +212,8 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
-  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+module "my_test_lambda" {
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
@@ -239,8 +241,8 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
-  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+module "my_test_lambda" {
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name      = "lambda_1"
   file_name          = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
@@ -253,9 +255,9 @@ module "lambda_function" {
 
 Assuming:
 
-- you have a folder with code of the lambda functionы located in the root directory.
-- each file name is `index.js`.
-- each file has a `handler` as a main function name.
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has a `handler` as a main function name.
 - subnets are previosly created.
 - security groups are previosly created.
 - efs volume is previosly created
@@ -270,51 +272,13 @@ Assuming:
 ```
 
 ```hcl
-module "lambda_function" {
+module "my_test_lambda" {
   for_each           = toset(["lambda_1", "lambda_2"])
-  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name      = each.value
   file_name          = "./source_code/${each.value}"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
   security_group_ids = ["sg-00112233"]
   efs_access_point   = aws_efs_access_point.access_point_for_lambda.arn
-}
-```
-
-## Example #7 - Share NPM Modules and Helper Methods Between Two Lambda Functions
-
-Assuming:
-
-- you have a folder with code of the lambda functionы located in the root directory.
-- each file name is `index.js`.
-- each file has a `handler` as a main function name.
-- you have folder `layer` with folder `nodejs` inside it.
-
-```hcl
-   root_directory/
-   |── source_code/
-      |── lambda_1/
-         |── index.js
-      |── lambda_2/
-         |── index.js
-   |── layer/
-      |── nodejs/
-         |── helper_methods.js
-         |── package.json
-```
-
-```hcl
-module "lambda_function" {
-  for_each           = toset(["lambda_1", "lambda_2"])
-  source             = "github.com/dmitrijslotko/terraform_lambda_builder.git?ref=latest"
-  function_name      = each.value
-  file_name          = "./source_code/${each.value}"
-  layers             = [module.lambda_layer.layer_output.arn]
-}
-
-module "lambda_layer" {
-  source          = "github.com/dmitrijslotko/terraform_layer_builder.git?ref=latest"
-  layer_name      = "my_layer"
-  layer_directory = "./layer"
 }
 ```

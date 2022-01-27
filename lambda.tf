@@ -1,21 +1,24 @@
 resource "aws_lambda_function" "lambda" {
-  filename                       = local.is_docker_lambda ? null : data.archive_file.archive.output_path
-  image_uri                      = local.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
+  filename                       = var.is_docker_lambda ? null : data.archive_file.archive.output_path
+  image_uri                      = var.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
   function_name                  = var.function_name
   source_code_hash               = data.archive_file.archive.output_base64sha256
   role                           = aws_iam_role.lambda_builder_iam_role.arn
-  handler                        = local.is_docker_lambda ? null : var.lambda_handler
+  handler                        = var.is_docker_lambda ? null : var.lambda_handler
   timeout                        = var.lambda_timeout
-  runtime                        = local.is_docker_lambda ? null : var.lambda_runtime
+  runtime                        = var.is_docker_lambda ? null : var.lambda_runtime
   memory_size                    = var.lambda_memory
-  package_type                   = local.is_docker_lambda ? "Image" : "Zip"
-  layers                         = local.is_docker_lambda ? null : var.layers
+  package_type                   = var.is_docker_lambda ? "Image" : "Zip"
+  layers                         = var.is_docker_lambda ? null : var.layers
   reserved_concurrent_executions = var.reserved_concurrent_executions
-
   dynamic "environment" {
-    for_each = var.enviroment_variables == null ? [] : ["a sigle element to trigger the block"]
+    for_each = var.enviroment_variables != null || var.layers != null || var.add_efs != null || var.efs_access_point != null ? ["a sigle element to trigger the block"] : []
     content {
-      variables = var.enviroment_variables
+      variables = merge(var.enviroment_variables, var.layers != null ? {
+        layer_prefix = local.layer_prefix
+        } : null, var.add_efs != null || var.efs_access_point != null ? {
+        local_mount_path = local.local_mount_path
+      } : null)
     }
   }
 
@@ -47,6 +50,10 @@ data "archive_file" "archive" {
   type        = "zip"
   source_dir  = var.file_name
   output_path = "${path.module}/.build/${var.function_name}.zip"
+
+  depends_on = [
+    local_file.copy_default_buildspec
+  ]
 }
 
 resource "aws_s3_bucket_object" "docker_artifact" {

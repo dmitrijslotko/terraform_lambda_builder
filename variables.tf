@@ -16,14 +16,14 @@ variable "file_name" {
 
 # ========== Optional fields ==========
 
-variable "policy_arn" {
-  type    = string
-  default = null
-}
-
 variable "lambda_runtime" {
   type    = string
   default = "nodejs14.x"
+}
+
+variable "role_policy" {
+  type    = string
+  default = null
 }
 
 variable "lambda_memory" {
@@ -56,8 +56,10 @@ variable "cloudwatch_log_retention_in_days" {
 }
 
 variable "enviroment_variables" {
-  type    = map(string)
-  default = null
+  type = map(string)
+  default = {
+    layer_prefix = "/opt/nodejs/"
+  }
 }
 
 variable "reserved_concurrent_executions" {
@@ -111,6 +113,21 @@ variable "image_count" {
   default = 5
 }
 
+variable "is_docker_lambda" {
+  type    = bool
+  default = false
+}
+
+variable "use_default_buildspec" {
+  type    = bool
+  default = false
+}
+
+variable "use_default_dockerfile" {
+  type    = bool
+  default = false
+}
+
 variable "artifact_bucket" {
   type    = string
   default = null
@@ -128,6 +145,24 @@ variable "build_timeout" {
 
 # ========== Image lambda fields ==========
 
+# ========== Deployment fields ==========
 
+variable "routing_interval" {
+  type    = number
+  default = 60
+}
 
+variable "routing_percentage" {
+  type    = number
+  default = 10
+}
+variable "traffic_routing_type" {
+  type    = string
+  default = null
+  validation {
+    condition     = var.traffic_routing_type == null || var.traffic_routing_type == "TimeBasedLinear" || var.traffic_routing_type == "TimeBasedCanary"
+    error_message = "The type should be TimeBasedLinear or TimeBasedCanary."
+  }
+}
 
+# ========== Deployment fields ==========
