@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - ls
+      - aws --version
+      - sam --version
+      - go version
+      - go mod init handler
+      - go mod tidy
+      - sam build 
+      - sam deploy --stack-name super-puper --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-9k7rt6vsjmmo --confirm-changeset --capabilities CAPABILITY_IAM
+  build:
+    commands:
+      - sam build
+      - ls

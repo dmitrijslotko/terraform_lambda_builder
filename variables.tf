@@ -16,6 +16,25 @@ variable "file_name" {
 
 # ========== Optional fields ==========
 
+variable "deploy_mode" {
+  type    = string
+  default = "default"
+  validation {
+    condition     = var.deploy_mode == "default" || var.deploy_mode == "SAM"
+    error_message = "Default deploy supported only for nodejs runtime otherwise chose SAM mode."
+  }
+}
+
+variable "sns_topic_arn" {
+  type    = string
+  default = null
+}
+
+variable "artifact_key" {
+  type    = string
+  default = null
+}
+
 variable "lambda_runtime" {
   type    = string
   default = "nodejs14.x"
@@ -141,6 +160,11 @@ variable "artifact_path" {
 variable "build_timeout" {
   type    = number
   default = 10
+}
+
+variable "lambda_role_arn" {
+  type    = string
+  default = null
 }
 
 # ========== Image lambda fields ==========

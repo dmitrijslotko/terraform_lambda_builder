@@ -282,3 +282,32 @@ module "my_test_lambda" {
   efs_access_point   = aws_efs_access_point.access_point_for_lambda.arn
 }
 ```
+
+## Example #6 - SAM deployment
+
+Assuming:
+
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.go`
+- it has a `handler` as a main function name.
+
+```hcl
+   root_directory/
+   |── source_code/
+      |── lambda_1/
+         |── index.go
+```
+
+```hcl
+module "my_test_lambda" {
+  source                  = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name           = "lambda_1"
+  file_name               = "./source_code/lambda_1"
+  deploy_mode             = "SAM"
+  artifact_bucket         = "REPLACE_WITH_YOUR_BUCKET_NAME"
+  artifact_key            = "REPLACE_WITH_YOUR_BUCKET_KEY"
+  lambda_runtime          = "go1.x"
+  alias                   = "live"
+  gradual_deployment_type = "Linear10PercentEvery1Minute"
+}
+```

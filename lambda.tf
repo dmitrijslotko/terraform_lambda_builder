@@ -1,9 +1,10 @@
 resource "aws_lambda_function" "lambda" {
+  count                          = var.deploy_mode == "default" ? 1 : 0
   filename                       = var.is_docker_lambda ? null : data.archive_file.archive.output_path
   image_uri                      = var.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
   function_name                  = var.function_name
   source_code_hash               = data.archive_file.archive.output_base64sha256
-  role                           = aws_iam_role.lambda_builder_iam_role.arn
+  role                           = var.lambda_role_arn == null ? aws_iam_role.lambda_builder_iam_role[0].arn : var.lambda_role_arn
   handler                        = var.is_docker_lambda ? null : var.lambda_handler
   timeout                        = var.lambda_timeout
   runtime                        = var.is_docker_lambda ? null : var.lambda_runtime
@@ -47,6 +48,7 @@ resource "aws_cloudwatch_log_group" "log" {
 }
 
 data "archive_file" "archive" {
+  count       = var.deploy_mode == "default" ? 1 : 0
   type        = "zip"
   source_dir  = var.file_name
   output_path = "${path.module}/.build/${var.function_name}.zip"

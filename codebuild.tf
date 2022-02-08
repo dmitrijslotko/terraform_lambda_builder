@@ -47,7 +47,7 @@ resource "null_resource" "codebuild_start" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "node codebuild_launch.js ${var.function_name} ${local.region}"
+    command     = "node codebuild_launch.js ${var.function_name} ${local.region} true"
     on_failure  = fail
   }
 

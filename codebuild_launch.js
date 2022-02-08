@@ -7,7 +7,8 @@ exports.handler = async () => {
 	const {build} = await codebuild
 		.startBuild({projectName})
 		.promise();
-	while (true) {
+	const wait_until_complete = process.argv[3];
+	while (wait_until_complete === true) {
 		const {builds} = await codebuild
 			.batchGetBuilds({
 				ids: [build.id],
@@ -19,8 +20,6 @@ exports.handler = async () => {
 				await new Promise((resolve) =>
 					setTimeout(resolve, 5000)
 				);
-				if (iterator) {
-				}
 				break;
 			}
 			if (iterator.buildStatus == "FAILED") {
