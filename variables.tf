@@ -16,6 +16,11 @@ variable "file_name" {
 
 # ========== Optional fields ==========
 
+variable "alias" {
+  type    = string
+  default = null
+}
+
 variable "deploy_mode" {
   type    = string
   default = "default"
@@ -89,6 +94,21 @@ variable "reserved_concurrent_executions" {
 variable "layers" {
   type    = list(string)
   default = [""]
+}
+
+variable "gradual_deployment_type" {
+  type    = string
+  default = "AllAtOnce"
+
+  validation {
+    condition     = contains(["AllAtOnce", "Canary10Percent30Minutes", "Canary10Percent5Minutes", "Canary10Percent10Minutes", "Canary10Percent15Minutes", "Linear10PercentEvery10Minutes", "Linear10PercentEvery1Minute", "Linear10PercentEvery2Minutes", "Linear10PercentEvery3Minutes"], var.gradual_deployment_type)
+    error_message = "Type should be one of the following: AllAtOnce, Canary10Percent30Minutes, Canary10Percent5Minutes, Canary10Percent10Minutes, Canary10Percent15Minutes, Linear10PercentEvery10Minutes, Linear10PercentEvery1Minute, Linear10PercentEvery2Minutes, Linear10PercentEvery3Minutes."
+  }
+}
+
+variable "gradual_deployment" {
+  type    = bool
+  default = true
 }
 
 # ========== Optional fields ==========

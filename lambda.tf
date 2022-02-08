@@ -1,10 +1,10 @@
 resource "aws_lambda_function" "lambda" {
   count                          = var.deploy_mode == "default" ? 1 : 0
-  filename                       = var.is_docker_lambda ? null : data.archive_file.archive.output_path
-  image_uri                      = var.is_docker_lambda ? "${aws_ecr_repository.ecr[0].repository_url}:${data.aws_ecr_image.image[0].image_tags[1]}" : null
+  filename                       = var.is_docker_lambda ? null : data.archive_file.archive[count.index].output_path
+  image_uri                      = var.is_docker_lambda ? "${aws_ecr_repository.ecr[count.index].repository_url}:${data.aws_ecr_image.image[count.index].image_tags[1]}" : null
   function_name                  = var.function_name
-  source_code_hash               = data.archive_file.archive.output_base64sha256
-  role                           = var.lambda_role_arn == null ? aws_iam_role.lambda_builder_iam_role[0].arn : var.lambda_role_arn
+  source_code_hash               = data.archive_file.archive[count.index].output_base64sha256
+  role                           = var.lambda_role_arn == null ? aws_iam_role.lambda_builder_iam_role[count.index].arn : var.lambda_role_arn
   handler                        = var.is_docker_lambda ? null : var.lambda_handler
   timeout                        = var.lambda_timeout
   runtime                        = var.is_docker_lambda ? null : var.lambda_runtime
@@ -62,6 +62,6 @@ resource "aws_s3_bucket_object" "docker_artifact" {
   count  = local.docker_lambda_count
   bucket = var.artifact_bucket
   key    = "${var.artifact_path}/${local.docker_artifact}"
-  source = data.archive_file.archive.output_path
-  etag   = filemd5(data.archive_file.archive.output_path)
+  source = data.archive_file.archive[count.index].output_path
+  etag   = filemd5(data.archive_file.archive[count.index].output_path)
 }
