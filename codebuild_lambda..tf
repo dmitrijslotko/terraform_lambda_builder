@@ -13,7 +13,7 @@ resource "local_file" "create_sam_template" {
             MemorySize : var.lambda_memory,
             Timeout : var.lambda_timeout,
             FunctionName : var.function_name,
-            Role : aws_iam_role.lambda_builder_iam_role.arn,
+            Role : var.lambda_role_arn == null ? aws_iam_role.lambda_builder_iam_role[count.index].arn : var.lambda_role_arn,
             AutoPublishAlias : var.alias,
             DeploymentPreference : {
               Enabled : var.gradual_deployment,
