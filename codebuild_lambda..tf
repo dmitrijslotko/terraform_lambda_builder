@@ -21,7 +21,6 @@ resource "local_file" "create_sam_template" {
               # Alarms : [aws_cloudwatch_metric_alarm.lambda_deploy_alarm[0].arn]
             }
             },
-            var.layers == null ? {} : { Layer : var.layers },
             var.subnet_ids == null ? {} : { VpcConfig : {
               SecurityGroupIds : var.security_group_ids,
               SubnetIds : var.subnet_ids
@@ -76,6 +75,16 @@ resource "aws_codebuild_project" "sam_project" {
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
+
+    environment_variable {
+      name  = "STACK_NAME"
+      value = replace(var.function_name, "_", "-")
+    }
+
+    environment_variable {
+      name  = "BUCKET_NAME"
+      value = var.artifact_bucket
+    }
   }
 
   source {
