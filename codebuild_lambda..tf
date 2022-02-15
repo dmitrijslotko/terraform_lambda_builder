@@ -18,7 +18,7 @@ resource "local_file" "create_sam_template" {
             DeploymentPreference : {
               Enabled : var.gradual_deployment,
               Type : var.gradual_deployment_type,
-              Alarms : [aws_cloudwatch_metric_alarm.lambda_deploy_alarm[0].arn]
+              # Alarms : [aws_cloudwatch_metric_alarm.lambda_deploy_alarm[0].arn]
             }
             },
             var.layers == null ? {} : { Layer : var.layers },
