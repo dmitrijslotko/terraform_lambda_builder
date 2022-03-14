@@ -1,6 +1,5 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  count = var.lambda_role_arn != null ? 0 : 1
-  name  = "${var.function_name}_role"
+  name = "${var.function_name}_role"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -55,14 +54,6 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
             }
           ]
       })
-    }
-  }
-
-  dynamic "inline_policy" {
-    for_each = var.subnet_ids == null ? [] : ["a sigle element to trigger the block"]
-    content {
-      name   = "additional_policy"
-      policy = var.role_policy
     }
   }
 }

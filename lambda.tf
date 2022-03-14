@@ -1,25 +1,19 @@
 resource "aws_lambda_function" "lambda" {
-  count                          = var.deploy_mode == "default" ? 1 : 0
-  filename                       = var.is_docker_lambda ? null : data.archive_file.archive[count.index].output_path
-  image_uri                      = var.is_docker_lambda ? "${aws_ecr_repository.ecr[count.index].repository_url}:${data.aws_ecr_image.image[count.index].image_tags[1]}" : null
-  function_name                  = var.function_name
-  source_code_hash               = data.archive_file.archive[count.index].output_base64sha256
-  role                           = var.lambda_role_arn == null ? aws_iam_role.lambda_builder_iam_role[count.index].arn : var.lambda_role_arn
-  handler                        = var.is_docker_lambda ? null : var.lambda_handler
-  timeout                        = var.lambda_timeout
-  runtime                        = var.is_docker_lambda ? null : var.lambda_runtime
-  memory_size                    = var.lambda_memory
-  package_type                   = var.is_docker_lambda ? "Image" : "Zip"
-  layers                         = var.is_docker_lambda ? null : var.layers
-  reserved_concurrent_executions = var.reserved_concurrent_executions
+  filename         = data.archive_file.archive.output_path
+  function_name    = var.function_name
+  role             = aws_iam_role.lambda_builder_iam_role.arn
+  handler          = var.handler
+  source_code_hash = data.archive_file.archive.output_base64sha256
+  runtime          = var.runtime
+  timeout          = var.timeout
+  layers           = var.layers
+  memory_size      = var.memory_size
+  publish          = var.alias != null
+
   dynamic "environment" {
-    for_each = var.enviroment_variables != null || var.layers != null || var.add_efs != null || var.efs_access_point != null ? ["a sigle element to trigger the block"] : []
+    for_each = var.enviroment_variables != null || var.layers != null || var.add_efs ? ["a sigle element to trigger the block"] : []
     content {
-      variables = merge(var.enviroment_variables, var.layers != null ? {
-        layer_prefix = local.layer_prefix
-        } : null, var.add_efs != null || var.efs_access_point != null ? {
-        local_mount_path = local.local_mount_path
-      } : null)
+      variables = merge(var.enviroment_variables, var.add_efs ? { local_mount_path : local.local_mount_path } : {}, var.layers != null ? { layer_prefix : local.layer_prefix } : {})
     }
   }
 
@@ -32,36 +26,26 @@ resource "aws_lambda_function" "lambda" {
   }
 
   dynamic "file_system_config" {
-    for_each = var.add_efs == false ? var.efs_access_point == null ? [] : [var.efs_access_point] : [var.add_efs]
+    for_each = var.add_efs ? [var.add_efs] : []
     content {
       # Every subnet should be able to reach an EFS mount target in the same Availability Zone. Cross-AZ mounts are not permitted.
       # Local mount path inside the lambda function. Must start with '/mnt/'.
-      arn              = var.add_efs == false ? var.efs_access_point : aws_efs_access_point.access_point_for_lambda[0].arn
-      local_mount_path = var.add_efs == false ? var.local_mount_path : local.local_mount_path
+      arn              = aws_efs_access_point.access_point_for_lambda[0].arn
+      local_mount_path = local.local_mount_path
     }
   }
 }
 
 resource "aws_cloudwatch_log_group" "log" {
   name              = "/aws/lambda/${var.function_name}"
-  retention_in_days = var.cloudwatch_log_retention_in_days
+  retention_in_days = var.lambda_retention_in_days
 }
+
 
 data "archive_file" "archive" {
-  count       = var.deploy_mode == "default" ? 1 : 0
   type        = "zip"
-  source_dir  = var.file_name
+  source_dir  = var.filename
   output_path = "${path.module}/.build/${var.function_name}.zip"
-
-  depends_on = [
-    local_file.copy_default_buildspec
-  ]
 }
 
-resource "aws_s3_bucket_object" "docker_artifact" {
-  count  = local.docker_lambda_count
-  bucket = var.artifact_bucket
-  key    = "${var.artifact_path}/${local.docker_artifact}"
-  source = data.archive_file.archive[count.index].output_path
-  etag   = filemd5(data.archive_file.archive[count.index].output_path)
-}
+

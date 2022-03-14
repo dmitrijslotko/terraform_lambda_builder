@@ -1,7 +1,7 @@
-output "lambda_output" {
-  value = var.deploy_mode == "SAM" ? data.aws_lambda_function.existing : aws_lambda_function.lambda[0]
+output "lambda" {
+  value = aws_lambda_function.lambda
 }
 
-data "aws_lambda_function" "existing" {
-  function_name = var.function_name
+output "role" {
+  value = aws_iam_role.lambda_builder_iam_role
 }

@@ -2,27 +2,21 @@
 
 `function_name` is for name of a lambda function.
 
-`file_name` is for path to a source code.
+`filename` is for path to a source code.
 
 ## Optional Variables
 
-`create_lambda_role` - default values is false. If it is ntrue than the module will create a role with basic permissions.
+`runtime` - default value is `nodejs14.x`.
 
-`lambda_runtime` - default value is `nodejs14.x`.
+`memory_size` - default value is `256`.
 
-`lambda_memory` - default value is `256`.
+`timeout` - default value is `30`seconds.
 
-`lambda_timeout` - default value is `30`seconds.
+`handler` - default value is `index.handler`. `index` is for main file name `index.js`. `handler` is main exported function name.
 
-`lambda_handler` - default value is `index.handler`. `index` is for main file name `index.js`. `handler` is main exported function name.
-
-`lambda_role` - role for a lambda function.
-
-`cloudwatch_log_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
+`lambda_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
 
 `enviroment_variables` - by default it is null.
-
-`reserved_concurrent_executions` - default value is -1.
 
 `layers` - by default no layers are added.
 
@@ -40,19 +34,15 @@ To add an EFS volume to a lambda use the following fields. Please note lambda sh
 
 `add_efs` - default value is `false`. If this value is true then the module will create the default efs volume and efs mount. No additional input is needed.
 
-`efs_access_point` - default values is null. Accepts `aws_efs_access_point` resource type.
+## Alias Variables
 
-`local_mount_path` - default values is `/mnt/efs`. Local mount path should start from /mnt/
+`alias` - Name for the alias you are creating. When alias has a value `publish` is automaticly enabled for a lambda.
 
-## Variables for Image Lambdas
+`versions_to_keep` - A number of how many lambda version you want to keep.
 
-`build_timeout` - default value is `10` minutes.
+`stable_version` - A version which is stable and you want to use it for traffic routing.
 
-`artifact_bucket` - default values is null. The bucket to store build artifacts.
-
-`artifact_path` - default values is "_artifacts_". It is used a key for the artifacts.
-
-`image_count` - default value is 5. How many images are stored in the image repository.
+`stable_version_weights` - A weight of how much traffic will go to a stable version lambda.
 
 ## Example #1 - Simple Lambda Function
 
@@ -70,9 +60,9 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source        = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
-  function_name = "my_test_lambda"
-  file_name     = "./lambda_1"
+  source         = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name  = "my_test_lambda"
+  filename       = "./lambda_1"
 }
 ```
 
@@ -93,14 +83,14 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
-  function_name                    = "my_test_lambda"
-  file_name                        = "./source_code/lambda_1"
-  enviroment_variables             = { Application : "demo_project", stage : "dev" }
-  lambda_memory                    = 512
-  lambda_timeout                   = 60
-  cloudwatch_log_retention_in_days = 7
-  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
+  source                   = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name            = "my_test_lambda"
+  filename                 = "./source_code/lambda_1"
+  enviroment_variables     = { Application : "demo_project", stage : "dev" }
+  memory_size              = 512
+  timeout                  = 60
+  lambda_retention_in_days = 7
+  lambda_role              = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
@@ -132,15 +122,15 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  for_each                         = toset(["lambda_1", "lambda_2"])
-  source                           = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
-  function_name                    = each.value
-  file_name                        = "./source_code/${each.value}"
-  enviroment_variables             = { Application : "demo_project", stage : "dev" }
-  lambda_memory                    = 512
-  lambda_timeout                   = 60
-  cloudwatch_log_retention_in_days = 7
-  lambda_role                      = aws_iam_role.lambda_builder_iam_role.arn
+  for_each                 = toset(["lambda_1", "lambda_2"])
+  source                   = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name            = each.value
+  filename                 = "./source_code/${each.value}"
+  enviroment_variables     = { Application : "demo_project", stage : "dev" }
+  memory_size              = 512
+  timeout                  = 60
+  lambda_retention_in_days = 7
+  lambda_role              = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
@@ -168,11 +158,11 @@ Assuming:
 ```hcl
 module "my_test_lambda" {
   for_each             = local.lambda_params
-  source               = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source               = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name        = each.key
-  file_name            = "./source_code/${each.key}"
-  lambda_memory        = try(each.value.lambda_memory, 128)
-  lambda_timeout       = try(each.value.lambda_timeout, 60)
+  filename             = "./source_code/${each.key}"
+  memory_size          = try(each.value.memory_size, 128)
+  timeout              = try(each.value.timeout, 60)
   lambda_role          = try(each.value.lambda_role, null)
   enviroment_variables = try(each.value.enviroment_variables, null)
 }
@@ -181,18 +171,18 @@ module "my_test_lambda" {
 locals {
   lambda_params = {
     lambda_1 = {
-      lambda_memory        = 256
+      memory_size          = 256
       enviroment_variables = { DYNAMO_DB = "my_private_table" }
     }
     lambda_2 = {
-      lambda_timeout = 30
-      lambda_role    = aws_iam_role.lambda_builder_iam_role.arn
+      timeout     = 30
+      lambda_role = aws_iam_role.lambda_builder_iam_role.arn
     }
   }
 }
 ```
 
-Terraform will create two lambdas with different memory, timeout, role and env variable. Other parametrs will have the excact match. Since some parameters are defined only for one lambda it should have a try catch operator inside the module to define a fallback variable. Please note the function_name and file_name value is taken from the key of the loop. The rest of the variables from the value of the loop.
+Terraform will create two lambdas with different memory, timeout, role and env variable. Other parametrs will have the excact match. Since some parameters are defined only for one lambda it should have a try catch operator inside the module to define a fallback variable. Please note the function_name and filename value is taken from the key of the loop. The rest of the variables from the value of the loop.
 
 ## Example #4 - Create Lambda in a Subnet
 
@@ -215,7 +205,7 @@ Assuming:
 module "my_test_lambda" {
   source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name      = "lambda_1"
-  file_name          = "./source_code/lambda_1"
+  filename           = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
   security_group_ids = ["sg-00112233"]
 }
@@ -242,9 +232,9 @@ Assuming:
 
 ```hcl
 module "my_test_lambda" {
-  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "lambda_1"
-  file_name          = "./source_code/lambda_1"
+  filename           = "./source_code/lambda_1"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
   security_group_ids = ["sg-00112233"]
   add_efs            = true
@@ -276,38 +266,38 @@ module "my_test_lambda" {
   for_each           = toset(["lambda_1", "lambda_2"])
   source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=v2.1.0"
   function_name      = each.value
-  file_name          = "./source_code/${each.value}"
+  filename           = "./source_code/${each.value}"
   subnet_ids         = ["subnet-abc123456", "subnet-xyz123456"]
   security_group_ids = ["sg-00112233"]
   efs_access_point   = aws_efs_access_point.access_point_for_lambda.arn
 }
 ```
 
-## Example #6 - SAM deployment
+## Example #7 - Lambda with an alias and traffic shifting
 
 Assuming:
 
 - you have a folder with code of a lambda function located in the root directory.
-- file name is `index.go`
+- file name is `index.js`
 - it has a `handler` as a main function name.
+- you have a lambda function with minimum of two versions.
 
 ```hcl
    root_directory/
    |── source_code/
       |── lambda_1/
-         |── index.go
+         |── index.js
 ```
 
 ```hcl
 module "my_test_lambda" {
-  source                  = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
-  function_name           = "lambda_1"
-  file_name               = "./source_code/lambda_1"
-  deploy_mode             = "SAM"
-  artifact_bucket         = "REPLACE_WITH_YOUR_BUCKET_NAME"
-  artifact_key            = "REPLACE_WITH_YOUR_BUCKET_KEY"
-  lambda_runtime          = "go1.x"
-  alias                   = "live"
-  gradual_deployment_type = "Linear10PercentEvery1Minute"
+  source                 = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name          = "my_test_lambda"
+  filename               = "./lambda_1"
+  alias                  = "live"
+  stable_version         = 19
+  stable_version_weights = 0.9
 }
 ```
+
+It creates a alias `live`, routes 90% of the traffic to a version `19` and 10% of the traffic to the latest version.
