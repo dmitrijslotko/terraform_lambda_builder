@@ -46,11 +46,20 @@ variable "memory_size" {
   default = 256
   validation {
     condition     = var.memory_size >= 256 || var.memory_size <= 10240
-    error_message = "Lambda memory should be between 256 and 10240."
+    error_message = "Lambda's memory should be between 256 and 10240."
   }
 }
 
-variable "enviroment_variables" {
+variable "ephemeral_storage" {
+  type    = number
+  default = 512
+  validation {
+    condition     = var.ephemeral_storage >= 512 || var.ephemeral_storage <= 10240
+    error_message = "Lambda's ephemeral storage should be between 512 and 10240."
+  }
+}
+
+variable "environment_variables" {
   type    = map(string)
   default = null
 }

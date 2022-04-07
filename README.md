@@ -16,7 +16,7 @@
 
 `lambda_retention_in_days` - default is 30 days. The cloudwatch logs for the lambda will be deleted after that time.
 
-`enviroment_variables` - by default it is null.
+`environment_variables` - by default it is null.
 
 `layers` - by default no layers are added.
 
@@ -86,11 +86,10 @@ module "my_test_lambda" {
   source                   = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name            = "my_test_lambda"
   filename                 = "./source_code/lambda_1"
-  enviroment_variables     = { Application : "demo_project", stage : "dev" }
+  environment_variables     = { Application : "demo_project", stage : "dev" }
   memory_size              = 512
   timeout                  = 60
   lambda_retention_in_days = 7
-  lambda_role              = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
@@ -126,11 +125,10 @@ module "my_test_lambda" {
   source                   = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name            = each.value
   filename                 = "./source_code/${each.value}"
-  enviroment_variables     = { Application : "demo_project", stage : "dev" }
+  environment_variables     = { Application : "demo_project", stage : "dev" }
   memory_size              = 512
   timeout                  = 60
   lambda_retention_in_days = 7
-  lambda_role              = aws_iam_role.lambda_builder_iam_role.arn
 }
 ```
 
@@ -163,8 +161,7 @@ module "my_test_lambda" {
   filename             = "./source_code/${each.key}"
   memory_size          = try(each.value.memory_size, 128)
   timeout              = try(each.value.timeout, 60)
-  lambda_role          = try(each.value.lambda_role, null)
-  enviroment_variables = try(each.value.enviroment_variables, null)
+  environment_variables = try(each.value.environment_variables, null)
 }
 
 
@@ -172,11 +169,10 @@ locals {
   lambda_params = {
     lambda_1 = {
       memory_size          = 256
-      enviroment_variables = { DYNAMO_DB = "my_private_table" }
+      environment_variables = { DYNAMO_DB = "my_private_table" }
     }
     lambda_2 = {
       timeout     = 30
-      lambda_role = aws_iam_role.lambda_builder_iam_role.arn
     }
   }
 }

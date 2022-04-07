@@ -1,14 +1,15 @@
 resource "aws_lambda_function" "lambda" {
-  filename         = data.archive_file.archive.output_path
-  function_name    = var.function_name
-  role             = aws_iam_role.lambda_builder_iam_role.arn
-  handler          = var.handler
-  source_code_hash = data.archive_file.archive.output_base64sha256
-  runtime          = var.runtime
-  timeout          = var.timeout
-  layers           = var.layers
-  memory_size      = var.memory_size
-  publish          = var.alias != null
+  filename          = data.archive_file.archive.output_path
+  function_name     = var.function_name
+  role              = aws_iam_role.lambda_builder_iam_role.arn
+  handler           = var.handler
+  source_code_hash  = data.archive_file.archive.output_base64sha256
+  runtime           = var.runtime
+  timeout           = var.timeout
+  layers            = var.layers
+  memory_size       = var.memory_size
+  publish           = var.alias != null
+  ephemeral_storage = var.ephemeral_storage
 
   dynamic "environment" {
     for_each = var.enviroment_variables != null || var.layers != null || var.add_efs ? ["a sigle element to trigger the block"] : []
