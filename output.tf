@@ -3,7 +3,7 @@ output "lambda" {
 }
 
 output "alias" {
-  value = aws_lambda_alias.lambda_alias
+  value = var.alias != null ? aws_lambda_alias.lambda_alias : null
 }
 
 output "role" {
