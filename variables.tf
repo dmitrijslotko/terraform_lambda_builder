@@ -37,8 +37,9 @@ variable "timeout" {
   }
 }
 variable "layers" {
-  type    = list(string)
-  default = null
+  type        = list(string)
+  default     = null
+  description = "expects to receive a list of layer arns"
 }
 
 variable "memory_size" {

@@ -18,7 +18,7 @@
 
 `environment_variables` - by default it is null.
 
-`layers` - by default no layers are added.
+`layers` - expects to receive a list of layer arns. By default no layers are added.
 
 ## VPC Variables
 
