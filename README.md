@@ -297,3 +297,64 @@ module "my_test_lambda" {
 ```
 
 It creates a alias `live`, routes 90% of the traffic to a version `19` and 10% of the traffic to the latest version.
+
+## Example #8 - Lambda with an alarm on errors
+
+Assuming:
+
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has a `handler` as a main function name.
+
+```hcl
+   root_directory/
+   |── lambda_1/
+      |── index.js
+```
+
+```hcl
+module "my_test_lambda" {
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name      = "my_test_lambda"
+  sns_topic          = "arn:aws:sns:region:account_id:topic_name"
+  actions_enabled    = true
+  alarm_priority     = "P2"
+  treat_missing_data = "notBreaching"
+  evaluation_periods = 1
+  period             = 60
+  alarm_type         = "error_detection"
+}
+```
+
+It creates an alarm based on errors and throttles. It send both alarm and ok states to the sns topic. It has a prefix P2 at the beggining of the alarm name. It does not goes to the alarm state if data is not receiving any data which makes it perfect for lambdas with infrequent invocations.
+
+## Example #9 - Lambda with an alarm based on anomaly detection
+
+Assuming:
+
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has a `handler` as a main function name.
+
+```hcl
+   root_directory/
+   |── lambda_1/
+      |── index.js
+```
+
+```hcl
+module "my_test_lambda" {
+  source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name      = "my_test_lambda"
+  sns_topic          = "arn:aws:sns:region:account_id:topic_name"
+  actions_enabled    = true
+  alarm_priority     = "P1"
+  treat_missing_data = "breaching"
+  evaluation_periods = 30
+  period             = 60
+  alarm_type         = "anomaly_detection"
+  normal_deviation   = 2
+}
+```
+
+It creates an alarm based on anomaly detection using five standart lambda metrics. It send both alarm and ok states to the sns topic. It has a prefix P1 at the beggining of the alarm name. It goes to the alarm state if data is not receiving which makes it perfect for lambdas with regular invocations. `normal_deviation` is for upper and lower border of the metrics. Value 2 gives the twice range to the upper and to the lower border of the anomaly detection. The bigger the number the less sensitive is an alarm.

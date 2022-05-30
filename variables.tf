@@ -13,6 +13,58 @@ variable "function_name" {
 }
 # MANDATORY FIELDS
 
+# ALARM FIELDS
+variable "sns_topic" {
+  type    = string
+  default = null
+}
+
+variable "actions_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "evaluation_periods" {
+  type    = number
+  default = 5
+}
+
+variable "period" {
+  type    = number
+  default = 60
+}
+
+variable "normal_deviation" {
+  type    = number
+  default = 2
+}
+
+variable "alarm_type" {
+  type = string
+  validation {
+    condition     = var.alarm_type == "error_detection" || var.treat_missing_data == "anomaly_detection"
+    error_message = "The values should be error_detection or anomaly_detection"
+  }
+}
+
+variable "treat_missing_data" {
+  type    = string
+  default = "notBreaching"
+  validation {
+    condition     = var.treat_missing_data == "notBreaching" || var.treat_missing_data == "breaching"
+    error_message = "The values should be breaching or notBreaching"
+  }
+}
+
+variable "alarm_priority" {
+  type    = string
+  default = "P2"
+  validation {
+    condition     = var.alarm_priority == "P1" || var.alarm_priority == "P2"
+    error_message = "The priority should be P1 or P2"
+  }
+}
+# ALARM FIELDS
 
 # OPTIONAL FIELDS
 variable "handler" {
