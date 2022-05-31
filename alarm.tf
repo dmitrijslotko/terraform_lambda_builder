@@ -131,7 +131,7 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
 
   metric_query {
     id          = "e1"
-    expression  = "errors + throttles"
+    expression  = "m1 + m2"
     return_data = "true"
   }
 }
