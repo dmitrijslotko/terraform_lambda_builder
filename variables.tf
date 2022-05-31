@@ -42,7 +42,7 @@ variable "normal_deviation" {
 variable "alarm_type" {
   type = string
   validation {
-    condition     = var.alarm_type == "error_detection" || var.treat_missing_data == "anomaly_detection"
+    condition     = var.alarm_type == "error_detection" || var.alarm_type == "anomaly_detection"
     error_message = "The values should be error_detection or anomaly_detection"
   }
 }
