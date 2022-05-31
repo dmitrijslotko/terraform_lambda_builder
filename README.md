@@ -316,6 +316,7 @@ Assuming:
 module "my_test_lambda" {
   source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "my_test_lambda"
+  filename           = "./lambda_1"
   sns_topic          = "arn:aws:sns:region:account_id:topic_name"
   actions_enabled    = true
   alarm_priority     = "P2"
@@ -346,6 +347,7 @@ Assuming:
 module "my_test_lambda" {
   source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "my_test_lambda"
+  filename           = "./lambda_1"
   sns_topic          = "arn:aws:sns:region:account_id:topic_name"
   actions_enabled    = true
   alarm_priority     = "P1"
