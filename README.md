@@ -317,6 +317,7 @@ module "my_test_lambda" {
   source             = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
   function_name      = "my_test_lambda"
   filename           = "./lambda_1"
+  add_alarm          = true
   sns_topic          = "arn:aws:sns:region:account_id:topic_name"
   actions_enabled    = true
   alarm_priority     = "P2"
@@ -350,6 +351,7 @@ module "my_test_lambda" {
   filename           = "./lambda_1"
   sns_topic          = "arn:aws:sns:region:account_id:topic_name"
   actions_enabled    = true
+  add_alarm          = true
   alarm_priority     = "P1"
   treat_missing_data = "breaching"
   evaluation_periods = 30

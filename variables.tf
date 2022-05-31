@@ -14,6 +14,11 @@ variable "function_name" {
 # MANDATORY FIELDS
 
 # ALARM FIELDS
+variable "add_alarm" {
+  type    = bool
+  default = false
+}
+
 variable "sns_topic" {
   type    = string
   default = null
@@ -40,7 +45,8 @@ variable "normal_deviation" {
 }
 
 variable "alarm_type" {
-  type = string
+  type    = string
+  default = "error_detection"
   validation {
     condition     = var.alarm_type == "error_detection" || var.alarm_type == "anomaly_detection"
     error_message = "The values should be error_detection or anomaly_detection"
