@@ -49,7 +49,7 @@ variable "alarm_type" {
   default = "error_detection"
   validation {
     condition     = var.alarm_type == "error_detection" || var.alarm_type == "anomaly_detection"
-    error_message = "The values should be error_detection or anomaly_detection"
+    error_message = "The values should be error_detection or anomaly_detection."
   }
 }
 
@@ -58,7 +58,7 @@ variable "treat_missing_data" {
   default = "notBreaching"
   validation {
     condition     = var.treat_missing_data == "notBreaching" || var.treat_missing_data == "breaching"
-    error_message = "The values should be breaching or notBreaching"
+    error_message = "The values should be breaching or notBreaching."
   }
 }
 
@@ -67,7 +67,7 @@ variable "alarm_priority" {
   default = "P2"
   validation {
     condition     = var.alarm_priority == "P1" || var.alarm_priority == "P2"
-    error_message = "The priority should be P1 or P2"
+    error_message = "The priority should be P1 or P2."
   }
 }
 # ALARM FIELDS
