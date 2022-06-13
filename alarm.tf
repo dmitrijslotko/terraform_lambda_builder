@@ -3,7 +3,7 @@ resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
   alarm_name          = "${var.alarm_priority}_${var.function_name}_anomaly_detection"
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
-  comparison_operator = "GreaterThanUpperThreshold"
+  comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
   treat_missing_data  = var.treat_missing_data
   threshold_metric_id = "ad1"
   evaluation_periods  = var.evaluation_periods
