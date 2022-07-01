@@ -78,9 +78,14 @@ variable "handler" {
   default = "index.handler"
 }
 
+variable "role_arn" {
+  type    = string
+  default = ""
+}
+
 variable "runtime" {
   type    = string
-  default = "nodejs14.x"
+  default = "nodejs16.x"
 }
 variable "lambda_retention_in_days" {
   type    = number
