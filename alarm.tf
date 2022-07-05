@@ -6,6 +6,7 @@ resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
   comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
   treat_missing_data  = var.treat_missing_data
   threshold_metric_id = "ad1"
+  datapoints_to_alarm = var.datapoints_to_alarm != 0 ? var.datapoints_to_alarm : ceil(0.1*var.evaluation_periods)
   evaluation_periods  = var.evaluation_periods
   actions_enabled     = var.actions_enabled
 
@@ -100,6 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
   ok_actions          = [var.sns_topic]
   treat_missing_data  = var.treat_missing_data
   threshold           = "0"
+  datapoints_to_alarm = var.datapoints_to_alarm != 0 ? var.datapoints_to_alarm : 1
   evaluation_periods  = var.evaluation_periods
   actions_enabled     = var.actions_enabled
 

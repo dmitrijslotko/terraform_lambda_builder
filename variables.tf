@@ -29,6 +29,11 @@ variable "actions_enabled" {
   default = true
 }
 
+variable "datapoints_to_alarm" {
+  type    = number
+  default = 0
+}
+
 variable "evaluation_periods" {
   type    = number
   default = 5
