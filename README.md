@@ -44,6 +44,43 @@ To add an EFS volume to a lambda use the following fields. Please note lambda sh
 
 `stable_version_weights` - A weight of how much traffic will go to a stable version lambda.
 
+## Alias Variables
+
+`actions_enabled` - Indicates whether the actions should be executed during any changes to the alarm's state. 
+Defaults to true. 
+
+`add_alarm` - Indicates whether the alarm should be added. 
+Defaults to false. 
+
+`alarm_priority` - The priority of the alarm that will be used as prefix to alarm name. 
+The following values are supported: anomaly_detection and error_detection.
+Defaults to error_detection.
+
+`alarm_type` - The type of preconfigured alarm to be added if add_alarm is true 
+The following values are supported: P1 and P2.
+Defaults to P2.
+
+`datapoints_to_alarm` - The number of datapoints that must be breaching to trigger the alarm. 
+Defaults to 1.
+
+`evaluation_periods` - The number of periods over which data is compared to the specified threshold. 
+Defaults to 5.
+
+`normal_deviation` - The number of standard deviation to be used for the band calculation, i.e. threshold metric. 
+Defaults to 2.
+
+`period` - The period in seconds over which the specified statistic is applied.
+Defaults to 60.
+
+`sns_topic` - The list of actions to execute when this alarm transitions into an ALARM or OK state from any other state. 
+Each action is specified as an Amazon Resource Name (ARN). 
+Defaults to null.
+
+`treat_missing_data` - Sets how this alarm is to handle missing data points. 
+The following values are supported: breaching and notBreaching. 
+Defaults to notBreaching.
+
+
 ## Example #1 - Simple Lambda Function
 
 Assuming:
