@@ -61,8 +61,7 @@ The following values are supported: P1 and P2.
 Defaults to P2.
 
 `datapoints_to_alarm` - The number of datapoints that must be breaching to trigger the alarm. 
-For alarm_type='anomaly_detection' defaults to 10% of evaluation periods.
-For alarm_type='error_detection' defaults to 1.
+Defaults to 1.
 
 `evaluation_periods` - The number of periods over which data is compared to the specified threshold. 
 Defaults to 5.

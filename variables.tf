@@ -31,7 +31,7 @@ variable "actions_enabled" {
 
 variable "datapoints_to_alarm" {
   type    = number
-  default = 0
+  default = 1
 }
 
 variable "evaluation_periods" {
