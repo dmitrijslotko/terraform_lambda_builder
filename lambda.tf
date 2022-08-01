@@ -1,20 +1,14 @@
 resource "aws_lambda_function" "lambda" {
-  filename      = data.archive_file.archive.output_path
-  function_name = var.function_name
-  role          = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role.arn : var.role_arn
-  handler       = var.handler
-  source_code_hash = try(sha256(join(
-    "-",
-    [
-      for file in fileset(var.filename, "**") :
-      sha256(replace(file("${var.filename}/${file}"), "/\\n|\\r/", ""))
-    ]
-  )), data.archive_file.archive.output_base64sha256)
-  runtime     = var.runtime
-  timeout     = var.timeout
-  layers      = var.layers
-  memory_size = var.memory_size
-  publish     = var.alias != null
+  filename         = data.archive_file.archive.output_path
+  function_name    = var.function_name
+  role             = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role.arn : var.role_arn
+  handler          = var.handler
+  source_code_hash = data.archive_file.archive.output_base64sha256
+  runtime          = var.runtime
+  timeout          = var.timeout
+  layers           = var.layers
+  memory_size      = var.memory_size
+  publish          = var.alias != null
   ephemeral_storage {
     size = var.ephemeral_storage
   }
