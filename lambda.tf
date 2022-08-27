@@ -3,7 +3,7 @@ resource "aws_lambda_function" "lambda" {
   function_name    = var.function_name
   role             = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role.arn : var.role_arn
   handler          = var.handler
-  source_code_hash = data.archive_file.archive.output_base64sha256
+  source_code_hash = filebase64sha256(data.archive_file.archive.output_path)
   runtime          = var.runtime
   timeout          = var.timeout
   layers           = var.layers

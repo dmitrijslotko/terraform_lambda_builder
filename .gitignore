@@ -30,3 +30,4 @@ override.tf.json
 node_modules
 lambda_code/layer/nodejs/*.json
 coverage
+.DS_Store
