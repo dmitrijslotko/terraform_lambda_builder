@@ -183,3 +183,12 @@ variable "versions_to_keep" {
 }
 
 # ALIAS FIELDS
+
+# AUTHORIZERS
+
+variable "appsync_authorizer" {
+  type    = string
+  default = null
+}
+
+# AUTHORIZERS
