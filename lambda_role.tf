@@ -50,7 +50,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
                 "ec2:AssignPrivateIpAddresses",
                 "ec2:UnassignPrivateIpAddresses"
               ],
-              "Resource" : "*"
+              "Resource" : "*",
             }
           ]
       })

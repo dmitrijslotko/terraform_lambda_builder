@@ -17,12 +17,12 @@ resource "aws_lambda_permission" "api_gw_permissions" {
 }
 
 resource "aws_lambda_permission" "s3_permissions" {
-  count         = var.s3_source_arn == null ? 0 : 1
+  count         = var.s3_notification_bucket_name == null ? 0 : 1
   statement_id  = "s3_permissions"
   action        = "lambda:InvokeFunction"
   function_name = local.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = var.s3_source_arn
+  source_arn    = "arn:aws:s3:::${var.s3_notification_bucket_name}"
 }
 
 resource "aws_lambda_permission" "sqs_permissions" {
@@ -34,11 +34,3 @@ resource "aws_lambda_permission" "sqs_permissions" {
   source_arn    = var.sqs_source_arn
 }
 
-resource "aws_lambda_permission" "cw_permissions" {
-  count         = local.cw_rule ? 1 : 0
-  statement_id  = "cw_permissions"
-  action        = "lambda:InvokeFunction"
-  function_name = local.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.rule[0].arn
-}

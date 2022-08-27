@@ -84,13 +84,27 @@ Defaults to null.
 The following values are supported: breaching and notBreaching.
 Defaults to notBreaching.
 
-`appsync_source_arn` - ARN of the aws_appsync_graphql_api object. Example: `aws_appsync_graphql_api.graphql_api.arn`
+`appsync_source_arn` - ARN of the aws_appsync_graphql_api object. Example: `appsync_source_arn = aws_appsync_graphql_api.graphql_api.arn`
 
-`api_gw_source_arn` - Execution arn and path of aws_api_gateway_rest_api object. Example: `"${aws_api_gateway_rest_api.api.execution_arn}/*/PUT/put_data"`
+`api_gw_source_arn` - Execution arn and path of aws_api_gateway_rest_api object. Example: `api_gw_source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/PUT/put_data"`
 
-`s3_source_arn` - ARN of the aws_s3_bucket object. Example: `aws_s3_bucket.bucket.arn`
+`s3_notification_bucket_name` - name of the aws s3 bucket.
 
-`sqs_source_arn` - ARN of the aws_sqs_queue object. Example: `aws_sqs_queue.queue.arn`
+`s3_notification_events` - name of the aws s3 bucket notification event. Example: `s3_notification_events = ["s3:ObjectCreated:*"]`
+
+`s3_notification_filter_prefix` - name of a folder in the backet. Example: `s3_notification_filter_prefix = "images/"`
+
+`s3_notification_filter_suffix` - name of a file extension. Example: `s3_notification_filter_suffix = ".jpeg"`
+
+`sqs_source_arn` - arn of the aws_sqs_queue object. Example: `sqs_source_arn = aws_sqs_queue.queue.arn`
+
+`dynamodb_stream_arn` - arn of a dynamodb stream . Example: `dynamodb_stream_arn = aws_dynamodb_table.table.stream_arn`
+
+`dynamodb_stream_starting_position` - starting position of a stream. Posible values are `LATEST, TRIM_HORIZON` Default values is `LATEST`.
+
+`kinesis_stream_arn` - arn of a kinesis stream. Example: `kinesis_stream_arn = aws_kinesis_stream.example.arn`
+
+`kinesis_stream_starting_position` - starting position of a stream. Posible values are `LATEST, TRIM_HORIZON, AT_TIMESTAMP` Default values is `LATEST`.
 
 ## Example #1 - Simple Lambda Function
 
