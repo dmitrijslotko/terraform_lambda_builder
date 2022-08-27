@@ -248,7 +248,7 @@ variable "kinesis_stream_starting_position" {
   type    = string
   default = "LATEST"
   validation {
-    condition     = var.dynamodb_stream_starting_position != "LATEST" || var.dynamodb_stream_starting_position != "TRIM_HORIZON" || var.dynamodb_stream_starting_position != "AT_TIMESTAMP"
+    condition     = var.kinesis_stream_starting_position != "LATEST" || var.kinesis_stream_starting_position != "TRIM_HORIZON" || var.kinesis_stream_starting_position != "AT_TIMESTAMP"
     error_message = "Allowed values are LATEST, TRIM_HORIZON or AT_TIMESTAMP."
   }
 }
