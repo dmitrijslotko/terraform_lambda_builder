@@ -17,3 +17,7 @@ output "arn" {
 output "invoke_arn" {
   value = var.alias != null ? aws_lambda_alias.lambda_alias[0].invoke_arn : aws_lambda_function.lambda.invoke_arn
 }
+
+output "function_name" {
+  value = local.function_name
+}

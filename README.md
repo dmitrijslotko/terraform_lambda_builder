@@ -20,6 +20,10 @@
 
 `layers` - expects to receive a list of layer arns. By default no layers are added.
 
+`role_arn` - it replace the default role.
+
+`ephemeral_storage`- internal storage of a lambda function.
+
 ## VPC Variables
 
 To deploy lambda in a VPC use the following fields.
@@ -46,40 +50,49 @@ To add an EFS volume to a lambda use the following fields. Please note lambda sh
 
 ## Alias Variables
 
-`actions_enabled` - Indicates whether the actions should be executed during any changes to the alarm's state. 
-Defaults to true. 
+`actions_enabled` - Indicates whether the actions should be executed during any changes to the alarm's state.
+Defaults to true.
 
-`add_alarm` - Indicates whether the alarm should be added. 
-Defaults to false. 
+`add_alarm` - Indicates whether the alarm should be added.
+Defaults to false.
 
-`alarm_priority` - The priority of the alarm that will be used as prefix to alarm name. 
+`alarm_priority` - The priority of the alarm that will be used as prefix to alarm name.
 The following values are supported: anomaly_detection and error_detection.
 Defaults to error_detection.
 
-`alarm_type` - The type of preconfigured alarm to be added if add_alarm is true 
+`alarm_type` - The type of preconfigured alarm to be added if add_alarm is true
 The following values are supported: P1 and P2.
 Defaults to P2.
 
-`datapoints_to_alarm` - The number of datapoints that must be breaching to trigger the alarm. 
+`datapoints_to_alarm` - The number of datapoints that must be breaching to trigger the alarm.
 Defaults to 1.
 
-`evaluation_periods` - The number of periods over which data is compared to the specified threshold. 
+`evaluation_periods` - The number of periods over which data is compared to the specified threshold.
 Defaults to 5.
 
-`normal_deviation` - The number of standard deviation to be used for the band calculation, i.e. threshold metric. 
+`normal_deviation` - The number of standard deviation to be used for the band calculation, i.e. threshold metric.
 Defaults to 2.
 
 `period` - The period in seconds over which the specified statistic is applied.
 Defaults to 60.
 
-`sns_topic` - The list of actions to execute when this alarm transitions into an ALARM or OK state from any other state. 
-Each action is specified as an Amazon Resource Name (ARN). 
+`sns_topic` - The list of actions to execute when this alarm transitions into an ALARM or OK state from any other state.
+Each action is specified as an Amazon Resource Name (ARN).
 Defaults to null.
 
-`treat_missing_data` - Sets how this alarm is to handle missing data points. 
-The following values are supported: breaching and notBreaching. 
+`treat_missing_data` - Sets how this alarm is to handle missing data points.
+The following values are supported: breaching and notBreaching.
 Defaults to notBreaching.
 
+`appsync_source_arn` - ARN of the aws_appsync_graphql_api object. Example: `aws_appsync_graphql_api.graphql_api.arn`
+
+`api_gw_source_arn` - Execution arn and path of aws_api_gateway_rest_api object. Example: `"${aws_api_gateway_rest_api.api.execution_arn}/*/PUT/put_data"`
+
+`s3_source_arn` - ARN of the aws_s3_bucket object. Example: `aws_s3_bucket.bucket.arn`
+
+`sqs_source_arn` - ARN of the aws_sqs_queue object. Example: `aws_sqs_queue.queue.arn`
+
+`cw_event_rule_arn` - ARN of the aws_cloudwatch_event_rule object. Example: `aws_cloudwatch_event_rule.event_rule.arn`
 
 ## Example #1 - Simple Lambda Function
 

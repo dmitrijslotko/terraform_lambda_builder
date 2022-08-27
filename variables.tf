@@ -184,11 +184,31 @@ variable "versions_to_keep" {
 
 # ALIAS FIELDS
 
-# AUTHORIZERS
+# LAMBDA PERMISSIONS
 
-variable "appsync_authorizer" {
+variable "appsync_source_arn" {
   type    = string
   default = null
 }
 
-# AUTHORIZERS
+variable "api_gw_source_arn" {
+  type    = string
+  default = null
+}
+
+variable "s3_source_arn" {
+  type    = string
+  default = null
+}
+
+variable "sqs_source_arn" {
+  type    = string
+  default = null
+}
+
+variable "cw_event_rule_arn" {
+  type    = string
+  default = null
+}
+
+# LAMBDA PERMISSIONS
