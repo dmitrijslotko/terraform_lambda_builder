@@ -6,7 +6,7 @@
 
 ## Optional Variables
 
-`runtime` - default value is `nodejs14.x`.
+`runtime` - default value is `nodejs16.x`.
 
 `memory_size` - default value is `256`.
 
