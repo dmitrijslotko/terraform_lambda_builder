@@ -11,7 +11,7 @@ output "role" {
 }
 
 output "arn" {
-  value = var.alias != null ? aws_lambda_alias.lambda_alias[0].arn : aws_lambda_function.lambda.arn
+  value = local.arn
 }
 
 output "invoke_arn" {

@@ -92,8 +92,6 @@ Defaults to notBreaching.
 
 `sqs_source_arn` - ARN of the aws_sqs_queue object. Example: `aws_sqs_queue.queue.arn`
 
-`cw_event_rule_arn` - ARN of the aws_cloudwatch_event_rule object. Example: `aws_cloudwatch_event_rule.event_rule.arn`
-
 ## Example #1 - Simple Lambda Function
 
 Assuming:

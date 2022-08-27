@@ -35,10 +35,10 @@ resource "aws_lambda_permission" "sqs_permissions" {
 }
 
 resource "aws_lambda_permission" "cw_permissions" {
-  count         = var.cw_event_rule_arn == null ? 0 : 1
+  count         = local.cw_rule ? 1 : 0
   statement_id  = "cw_permissions"
   action        = "lambda:InvokeFunction"
   function_name = local.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = var.cw_event_rule_arn
+  source_arn    = aws_cloudwatch_event_rule.rule[0].arn
 }

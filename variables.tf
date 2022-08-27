@@ -206,9 +206,23 @@ variable "sqs_source_arn" {
   default = null
 }
 
-variable "cw_event_rule_arn" {
+# LAMBDA PERMISSIONS
+
+
+# CW EVENT RULE
+
+variable "cw_event_input" {
   type    = string
   default = null
 }
 
-# LAMBDA PERMISSIONS
+variable "cw_event_is_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "cw_event_cron_expression" {
+  type    = string
+  default = null
+}
+# CW EVENT RULE
