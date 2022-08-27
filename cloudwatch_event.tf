@@ -7,7 +7,7 @@ resource "aws_cloudwatch_event_rule" "rule" {
 
 resource "aws_cloudwatch_event_target" "target" {
   count = local.cw_rule ? 1 : 0
-  rule  = aws_cloudwatch_event_rule.rule.name
+  rule  = aws_cloudwatch_event_rule.rule[0].name
   arn   = local.arn
   input = var.cw_event_input
 }
