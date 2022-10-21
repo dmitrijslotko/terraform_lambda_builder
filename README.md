@@ -56,6 +56,8 @@ Defaults to true.
 `add_alarm` - Indicates whether the alarm should be added.
 Defaults to false.
 
+`alarm_name` - This name will as a replace of a default alarm name pattern.
+
 `alarm_priority` - The priority of the alarm that will be used as prefix to alarm name.
 The following values are supported: anomaly_detection and error_detection.
 Defaults to error_detection.

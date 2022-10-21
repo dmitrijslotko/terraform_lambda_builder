@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
   count               = var.add_alarm == true && var.alarm_type == "anomaly_detection" ? 1 : 0
-  alarm_name          = "${var.alarm_priority}_${var.function_name}_anomaly_detection"
+  alarm_name          = var.alarm_name == null ? "${var.alarm_priority}_${var.function_name}_anomaly_detection" : var.alarm_name
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
   comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
 resource "aws_cloudwatch_metric_alarm" "error_detection" {
   count               = var.add_alarm == true && var.alarm_type == "error_detection" ? 1 : 0
   comparison_operator = "GreaterThanThreshold"
-  alarm_name          = "${var.alarm_priority}_${var.function_name}_error_detection"
+  alarm_name          = var.alarm_name == null ? "${var.alarm_priority}_${var.function_name}_error_detection" : var.alarm_name
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
   treat_missing_data  = var.treat_missing_data
