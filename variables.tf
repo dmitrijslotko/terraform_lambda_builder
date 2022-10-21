@@ -49,6 +49,11 @@ variable "normal_deviation" {
   default = 2
 }
 
+variable "alarm_name" {
+  type    = string
+  default = null
+}
+
 variable "alarm_type" {
   type    = string
   default = "error_detection"
