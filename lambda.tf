@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "lambda" {
   filename         = data.archive_file.archive.output_path
   function_name    = var.function_name
-  role             = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role.arn : var.role_arn
+  role             = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role[0].arn : var.role_arn
   handler          = var.handler
   source_code_hash = filebase64sha256(data.archive_file.archive.output_path)
   runtime          = var.runtime
