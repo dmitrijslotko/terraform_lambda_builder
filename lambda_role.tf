@@ -1,5 +1,6 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  name = "${var.function_name}_role"
+  count = var.role_arn == "" ? 1 : 0
+  name  = "${var.function_name}_role"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -17,20 +18,24 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
       ]
   })
 
-  inline_policy {
-    name = "cloudwatch_logs"
+  dynamic "inline_policy" {
+    for_each = var.create_cloudwatch_log_group == true ? ["a sigle element to trigger the block"] : []
+    content {
+      name = "cloudwatch_logs"
 
-    policy = jsonencode(
-      {
-        "Statement" : [{
-          "Action" : [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource" : "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.log.name}:*",
-          "Effect" : "Allow"
-        }]
-    })
+      policy = jsonencode(
+        {
+          "Statement" : [{
+            "Action" : [
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource" : "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.log[0].name}:*",
+            "Effect" : "Allow"
+          }]
+      })
+    }
+
   }
 
   dynamic "inline_policy" {
@@ -56,4 +61,10 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
       })
     }
   }
+}
+
+
+data "aws_iam_role" "external_role" {
+  count = var.role_arn != "" ? 1 : 0
+  name  = local.external_role_name
 }
