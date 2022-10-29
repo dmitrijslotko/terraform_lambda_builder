@@ -62,3 +62,9 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
     }
   }
 }
+
+
+data "aws_iam_role" "external_role" {
+  count = var.role_arn != "" ? 1 : 0
+  name  = local.external_role_name
+}

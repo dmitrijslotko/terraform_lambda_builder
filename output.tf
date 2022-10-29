@@ -7,7 +7,7 @@ output "alias" {
 }
 
 output "role" {
-  value = aws_iam_role.lambda_builder_iam_role
+  value = var.role_arn != "" ? data.aws_iam_role.external_role[0] : aws_iam_role.lambda_builder_iam_role[0]
 }
 
 output "arn" {
