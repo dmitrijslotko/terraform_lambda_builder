@@ -1,6 +1,5 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  count = var.role_arn == "" ? 1 : 0
-  name  = "${var.function_name}_role"
+  name = "${var.function_name}_role"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -63,8 +62,3 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   }
 }
 
-
-data "aws_iam_role" "external_role" {
-  count = var.role_arn != "" ? 1 : 0
-  name  = local.external_role_name
-}
