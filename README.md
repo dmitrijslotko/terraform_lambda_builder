@@ -86,28 +86,6 @@ Defaults to null.
 The following values are supported: breaching and notBreaching.
 Defaults to notBreaching.
 
-`appsync_source_arn` - ARN of the aws_appsync_graphql_api object. Example: `appsync_source_arn = aws_appsync_graphql_api.graphql_api.arn`
-
-`api_gw_source_arn` - Execution arn and path of aws_api_gateway_rest_api object. Example: `api_gw_source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/PUT/put_data"`
-
-`s3_notification_bucket_name` - name of the aws s3 bucket.
-
-`s3_notification_events` - name of the aws s3 bucket notification event. Example: `s3_notification_events = ["s3:ObjectCreated:*"]`
-
-`s3_notification_filter_prefix` - name of a folder in the backet. Example: `s3_notification_filter_prefix = "images/"`
-
-`s3_notification_filter_suffix` - name of a file extension. Example: `s3_notification_filter_suffix = ".jpeg"`
-
-`sqs_source_arn` - arn of the aws_sqs_queue object. Example: `sqs_source_arn = aws_sqs_queue.queue.arn`
-
-`dynamodb_stream_arn` - arn of a dynamodb stream . Example: `dynamodb_stream_arn = aws_dynamodb_table.table.stream_arn`
-
-`dynamodb_stream_starting_position` - starting position of a stream. Posible values are `LATEST, TRIM_HORIZON` Default values is `LATEST`.
-
-`kinesis_stream_arn` - arn of a kinesis stream. Example: `kinesis_stream_arn = aws_kinesis_stream.example.arn`
-
-`kinesis_stream_starting_position` - starting position of a stream. Posible values are `LATEST, TRIM_HORIZON, AT_TIMESTAMP` Default values is `LATEST`.
-
 ## Example #1 - Simple Lambda Function
 
 Assuming:
@@ -426,3 +404,25 @@ module "my_test_lambda" {
 ```
 
 It creates an alarm based on anomaly detection using five standart lambda metrics. It send both alarm and ok states to the sns topic. It has a prefix P1 at the beggining of the alarm name. It goes to the alarm state if data is not receiving which makes it perfect for lambdas with regular invocations. `normal_deviation` is for upper and lower border of the metrics. Value 2 gives the twice range to the upper and to the lower border of the anomaly detection. The bigger the number the less sensitive is an alarm.
+
+## Example 10 - Lambda with function created from S3 Bucket
+
+- you have a folder with code of a lambda function located in the root directory.
+- file name is `index.js`
+- it has a `handler` as a main function name.
+
+```hcl
+   root_directory/
+   |── lambda_1/
+      |── index.js
+```
+
+```hcl
+module "my_test_lambda" {
+  source         = "git@github.com:dmitrijslotko/terraform_lambda_builder.git?ref=latest"
+  function_name  = "my_test_lambda"
+  filename       = "./lambda_1"
+  bucket        = "my-bucket-name"
+  key           = "lambda_source.zip"
+}
+```

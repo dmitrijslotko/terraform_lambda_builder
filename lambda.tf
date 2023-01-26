@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "lambda" {
-  filename         = data.archive_file.archive.output_path
+  filename         = local.s3_source ? data.archive_file.archive.output_path : null
   function_name    = var.function_name
   role             = var.role_arn == "" ? aws_iam_role.lambda_builder_iam_role.arn : var.role_arn
   handler          = var.handler
@@ -9,6 +9,8 @@ resource "aws_lambda_function" "lambda" {
   layers           = var.layers
   memory_size      = var.memory_size
   publish          = var.alias != null
+  s3_bucket        = local.s3_source ? null : var.bucket
+  s3_key           = local.s3_source ? null : var.key
   ephemeral_storage {
     size = var.ephemeral_storage
   }
@@ -37,6 +39,10 @@ resource "aws_lambda_function" "lambda" {
       local_mount_path = local.local_mount_path
     }
   }
+
+  depends_on = [
+    aws_s3_bucket_object.lambda_source
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "log" {
@@ -44,12 +50,4 @@ resource "aws_cloudwatch_log_group" "log" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.lambda_retention_in_days
 }
-
-
-data "archive_file" "archive" {
-  type        = "zip"
-  source_dir  = var.filename
-  output_path = "${path.module}/.build/${var.function_name}.zip"
-}
-
 
