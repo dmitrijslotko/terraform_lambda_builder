@@ -143,16 +143,6 @@ variable "environment_variables" {
   default = null
 }
 
-variable "bucket" {
-  type    = string
-  default = null
-}
-variable "key" {
-  type    = string
-  default = null
-}
-
-
 # OPTIONAL FIELDS
 
 
@@ -203,3 +193,96 @@ variable "versions_to_keep" {
 }
 
 # ALIAS FIELDS
+
+# LAMBDA PERMISSIONS
+
+variable "appsync_source_arn" {
+  type    = string
+  default = null
+}
+
+variable "api_gw_source_arn" {
+  type    = string
+  default = null
+}
+
+variable "s3_notification_bucket_name" {
+  type    = string
+  default = null
+}
+
+variable "s3_notification_events" {
+  type    = list(string)
+  default = null
+}
+
+variable "s3_notification_filter_prefix" {
+  type    = string
+  default = null
+}
+
+variable "s3_notification_filter_suffix" {
+  type    = string
+  default = null
+}
+
+variable "sqs_source_arn" {
+  type    = string
+  default = null
+}
+
+# LAMBDA PERMISSIONS
+
+# EVENT SOURCE MAPPINGS
+
+variable "dynamodb_stream_arn" {
+  type    = string
+  default = null
+}
+
+variable "dynamodb_stream_starting_position" {
+  type    = string
+  default = "LATEST"
+  validation {
+    condition     = var.dynamodb_stream_starting_position != "LATEST" || var.dynamodb_stream_starting_position != "TRIM_HORIZON"
+    error_message = "Allowed values are LATEST or TRIM_HORIZON."
+  }
+}
+
+variable "kinesis_stream_arn" {
+  type    = string
+  default = null
+}
+
+variable "kinesis_stream_starting_position" {
+  type    = string
+  default = "LATEST"
+  validation {
+    condition     = var.kinesis_stream_starting_position != "LATEST" || var.kinesis_stream_starting_position != "TRIM_HORIZON" || var.kinesis_stream_starting_position != "AT_TIMESTAMP"
+    error_message = "Allowed values are LATEST, TRIM_HORIZON or AT_TIMESTAMP."
+  }
+}
+
+# EVENT SOURCE MAPPINGS
+
+
+# CW EVENT RULE
+variable "cron_config" {
+  type = object({
+    enabled         = bool
+    input           = string
+    cron_expression = string
+  })
+  default = null
+}
+# CW EVENT RULE
+
+
+variable "arhitecture" {
+  type    = string
+  default = "arm64"
+  validation {
+    condition     = var.arhitecture == "x86_64" || var.arhitecture == "arm64"
+    error_message = "The values should be x86_64 or arm64."
+  }
+}
