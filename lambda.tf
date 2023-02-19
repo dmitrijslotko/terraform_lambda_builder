@@ -1,19 +1,18 @@
 resource "aws_lambda_function" "lambda" {
-  filename      = var.s3_source_config == null ? data.archive_file.archive.output_path : null
-  function_name = var.config.function_name
-  role          = var.config.role_arn == null ? aws_iam_role.lambda_builder_iam_role.arn : var.config.role_arn
-  handler       = var.config.handler
-  description   = var.config.description
-  # source_code_hash  = var.s3_source_config == null ? filebase64sha256(data.archive_file.archive.output_path) : aws_s3_bucket_object.lambda_source[0].etag
-  source_code_hash  = filebase64sha256(data.archive_file.archive.output_path)
+  filename          = var.s3_source_config == null ? data.archive_file.archive.output_path : null
+  function_name     = var.config.function_name
+  role              = var.config.role_arn == null ? aws_iam_role.lambda_builder_iam_role[0].arn : var.config.role_arn
+  handler           = var.config.handler
+  description       = var.config.description
+  source_code_hash  = try(aws_s3_bucket_object.lambda_source[0].etag, filebase64sha256(data.archive_file.archive.output_path))
   runtime           = var.config.runtime
   timeout           = var.config.timeout
   layers            = var.config.layers
   memory_size       = var.config.memory_size
   publish           = var.config.publish || var.alias_config != null
-  s3_bucket         = var.s3_source_config == null ? null : var.s3_source_config.bucket
-  s3_key            = var.s3_source_config == null ? null : var.s3_source_config.key
-  s3_object_version = var.s3_source_config == null ? null : var.s3_source_config.version == null ? aws_s3_bucket_object.lambda_source[0].version_id : var.s3_source_config.version
+  s3_bucket         = try(var.s3_source_config.bucket, null)
+  s3_key            = try(var.s3_source_config.key, null)
+  s3_object_version = try(var.s3_source_config.version, null)
   architectures     = [var.config.arhitecture]
   ephemeral_storage {
     size = var.config.ephemeral_storage
