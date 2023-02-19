@@ -13,6 +13,7 @@ variable "config" {
     role_arn              = optional(string, null),
     ephemeral_storage     = optional(number, 512),
     publish               = optional(bool, false),
+    force_deploy          = optional(bool, false)
   })
 
   validation {
@@ -141,7 +142,7 @@ variable "kinesis_event_trigger" {
     parallelization_factor             = optional(number, 1),
     function_response_types            = optional(list(string), null),
     starting_position_timestamp        = optional(string, null),
-    tumbling_window_in_seconds         = optional(number, 60),
+    tumbling_window_in_seconds         = optional(number, 0),
     filter_criteria_pattern            = optional(string, null),
   })
   default = null
@@ -161,7 +162,7 @@ variable "dynamo_event_trigger" {
     parallelization_factor             = optional(number, 1),
     function_response_types            = optional(list(string), null),
     starting_position_timestamp        = optional(string, null),
-    tumbling_window_in_seconds         = optional(number, 60),
+    tumbling_window_in_seconds         = optional(number, 0),
     filter_criteria_pattern            = optional(string, null),
   })
   default = null

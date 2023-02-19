@@ -4,7 +4,7 @@ resource "aws_lambda_function" "lambda" {
   role              = var.config.role_arn == null ? aws_iam_role.lambda_builder_iam_role[0].arn : var.config.role_arn
   handler           = var.config.handler
   description       = var.config.description
-  source_code_hash  = try(aws_s3_bucket_object.lambda_source[0].etag, filebase64sha256(data.archive_file.archive.output_path))
+  source_code_hash  = try(var.config.force_deploy == true ? null : data.archive_file.archive.output_base64sha256, null)
   runtime           = var.config.runtime
   timeout           = var.config.timeout
   layers            = var.config.layers
