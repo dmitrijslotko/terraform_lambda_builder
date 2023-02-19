@@ -1,14 +1,14 @@
 resource "aws_efs_file_system" "efs_for_lambda" {
-  count = var.add_efs == true ? 1 : 0
+  count = var.efs_config == null ? 0 : 1
   tags = {
-    Name = "${var.function_name}_efs"
+    Name = var.efs_config.name == null ? "${var.config.function_name}_efs" : var.efs_config.name
   }
 }
 
 resource "aws_efs_access_point" "access_point_for_lambda" {
-  count = var.add_efs == true ? 1 : 0
+  count = var.efs_config == null ? 0 : 1
 
-  file_system_id = aws_efs_file_system.efs_for_lambda[count.index].id
+  file_system_id = aws_efs_file_system.efs_for_lambda[0].id
 
   root_directory {
     path = "/lambda"
@@ -25,13 +25,13 @@ resource "aws_efs_access_point" "access_point_for_lambda" {
   }
 
   tags = {
-    Name = "${var.function_name}"
+    Name = var.efs_config.name == null ? "${var.config.function_name}_efs" : var.efs_config.name
   }
 }
 
 resource "aws_efs_mount_target" "mount_target" {
-  for_each        = var.add_efs == true ? toset(var.subnet_ids) : []
+  count           = try(length(var.efs_config.subnet_ids), 0)
   file_system_id  = aws_efs_file_system.efs_for_lambda[0].id
-  subnet_id       = each.value
-  security_groups = var.security_group_ids
+  subnet_id       = var.efs_config.subnet_ids[count.index]
+  security_groups = var.efs_config.security_group_ids
 }

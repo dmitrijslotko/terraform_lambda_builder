@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
-  name = "${var.function_name}_role"
+  name = var.config.function_name
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -18,7 +18,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   })
 
   dynamic "inline_policy" {
-    for_each = var.create_cloudwatch_log_group == true ? ["a sigle element to trigger the block"] : []
+    for_each = var.log_group_config == null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "cloudwatch_logs"
 
@@ -38,7 +38,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   }
 
   dynamic "inline_policy" {
-    for_each = var.subnet_ids == null ? [] : ["a sigle element to trigger the block"]
+    for_each = var.vpc_config != null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "vpc_access_execution_role"
       policy = jsonencode(
