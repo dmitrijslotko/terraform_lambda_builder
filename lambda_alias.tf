@@ -3,6 +3,7 @@ resource "aws_lambda_alias" "lambda_alias" {
   name             = var.alias_config.name
   function_name    = aws_lambda_function.lambda.arn
   function_version = aws_lambda_function.lambda.version
+  description      = var.alias_config.description
 
   dynamic "routing_config" {
     for_each = var.alias_config.stable_version != null && var.alias_config.stable_version_weights < 1 && aws_lambda_function.lambda.version > 1 ? ["a sigle element to trigger the block"] : []

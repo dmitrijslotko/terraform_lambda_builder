@@ -9,7 +9,7 @@ variable "config" {
     layers                = optional(list(string), null),
     runtime               = optional(string, "nodejs18.x"),
     environment_variables = optional(map(string), null),
-    arhitecture           = optional(string, "arm64"),
+    architecture          = optional(string, "arm64"),
     role_arn              = optional(string, null),
     ephemeral_storage     = optional(number, 512),
     publish               = optional(bool, false),
@@ -33,6 +33,11 @@ variable "config" {
   validation {
     condition     = var.config.memory_size >= 128 && var.config.memory_size <= 10240
     error_message = "Memory size should be between 128 and 10240."
+  }
+
+  validation {
+    condition     = var.config.architecture == "arm64" || var.config.architecture == "x86_64"
+    error_message = "Architecture should be either arm64 or x86_64."
   }
 }
 
@@ -65,8 +70,8 @@ variable "vpc_config" {
 
 variable "alias_config" {
   type = object({
-    name                   = string
-    description            = optional(string, null),
+    name                   = optional(string, "live")
+    description            = optional(string, "alias for live version"),
     stable_version_weights = optional(number, 1),
     stable_version         = optional(string, null),
     versions_to_keep       = optional(number, 5),
@@ -76,14 +81,13 @@ variable "alias_config" {
 
 variable "alarm_config" {
   type = object({
+    type                = optional(string, "error_detection"),
     period              = optional(number, 60),
-    sns_topic           = optional(string, null),
     actions_enabled     = optional(bool, true),
     datapoints_to_alarm = optional(number, 1),
     evaluation_periods  = optional(number, 5),
     normal_deviation    = optional(number, 2),
     name                = optional(string, null),
-    type                = optional(string, "error_detection"),
     treat_missing_data  = optional(string, "breaching"),
     statistic           = optional(string, "Sum"),
     comparison_operator = optional(string, "GreaterThanOrEqualToThreshold"),
@@ -95,116 +99,52 @@ variable "alarm_config" {
   })
   default = null
 
-  # validation {
-  #   condition     = var.alarm_config.priority == "P1" || var.alarm_config.priority == "P2"
-  #   error_message = "The priority should be P1 or P2."
-  # }
-  # validation {
-  #   condition     = var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection"
-  #   error_message = "The values should be error_detection or anomaly_detection."
-  # }
+  validation {
+    condition     = try(var.alarm_config.priority == "P1" || var.alarm_config.priority == "P2", true)
+    error_message = "The priority should be P1 or P2."
+  }
+  validation {
+    condition     = try(var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection", true)
+    error_message = "The values should be error_detection or anomaly_detection."
+  }
 
-  # validation {
-  #   condition     = var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching"
-  #   error_message = "The values should be missing, notBreaching or breaching."
-  # }
-}
-
-variable "appsync_event_trigger" {
-  type = object({
-    enabled = optional(bool, true),
-    api_id  = string,
-    field   = string,
-    type    = string
-  })
-  default = null
-}
-
-
-variable "api_gateway_trigger" {
-  type = object({
-    enabled     = optional(bool, true),
-    rest_api_id = string,
-    stage_name  = string,
-    method      = string,
-    path        = string
-  })
-  default = null
-}
-
-variable "s3_event_trigger" {
-  type = object({
-    bucket_name = string,
-    events      = list(string),
-    filter = optional(object({
-      prefix = optional(string, null),
-      suffix = optional(string, null)
-    }), null)
-  })
-  default = null
+  validation {
+    condition     = try(var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching", true)
+    error_message = "The values should be missing, notBreaching or breaching."
+  }
 }
 
 variable "sqs_event_trigger" {
   type = object({
-    enabled            = optional(bool, true),
-    batch_size         = optional(number, 10),
-    maximum_batching_w = optional(number, 10000),
-    maximum_record_age = optional(number, 604800),
-    maximum_retry      = optional(number, 10000),
-    bisect_batch_on_f  = optional(bool, false),
-    destination_config = optional(object({
-      on_success = optional(object({
-        destination = string
-      }), null)
-      on_failure = optional(object({
-        destination = string
-      }), null)
-    }), null)
+    sqs_arn                            = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 10),
+    filter_criteria                    = optional(string, null),
+    maximum_batching_window_in_seconds = optional(number, 0),
+    function_response_types            = optional(list(string), null),
+    scaling_config                     = optional(string, null),
   })
   default = null
-}
-
-variable "dynamo_event_trigger" {
-  type = object({
-    dynamodb_stream_arn = string,
-    batch_size          = optional(number, 100),
-    enabled             = optional(bool, true),
-    starting_position   = optional(string, "LATEST"),
-    parallelization     = optional(number, 1),
-    maximum_batching_w  = optional(number, 10000),
-    maximum_record_age  = optional(number, 604800),
-    maximum_retry       = optional(number, 10000),
-    bisect_batch_on_f   = optional(bool, false),
-    destination_config = optional(object({
-      on_success = optional(object({
-        destination = string
-      }), null)
-      on_failure = optional(object({
-        destination = string
-      }), null)
-    }), null)
-  })
-  default = null
-
-  # validation {
-  #   condition     = var.dynamo_event_trigger.starting_position != "LATEST" || var.dynamo_event_trigger.starting_position != "TRIM_HORIZON"
-  #   error_message = "Allowed values are LATEST or TRIM_HORIZON."
-  # }
 }
 
 variable "kinesis_event_trigger" {
   type = object({
-    kinesis_arn       = string,
-    batch_size        = optional(number, 500),
-    enabled           = optional(bool, true),
-    starting_position = optional(string, "LATEST")
+    kinesis_arn                        = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 500),
+    bisect_batch_on_function_error     = optional(bool, false),
+    on_failure_destination_sqs_arn     = optional(string, null),
+    maximum_record_age_in_seconds      = optional(number, 604800),
+    maximum_retry_attempts             = optional(number, 2),
+    starting_position                  = optional(string, "LATEST"),
+    maximum_batching_window_in_seconds = optional(number, 0),
+    parallelization_factor             = optional(number, 1),
+    function_response_types            = optional(list(string), null),
+    starting_position_timestamp        = optional(string, null),
+    tumbling_window_in_seconds         = optional(number, 60),
+    filter_criteria_pattern            = optional(string, null),
   })
   default = null
-
-  # validation {
-  #   condition     = var.kinesis_event_trigger != null && var.kinesis_event_trigger.starting_position != "LATEST" || var.kinesis_event_trigger.starting_position != "TRIM_HORIZON" || var.kinesis_event_trigger.starting_position != "AT_TIMESTAMP"
-  #   error_message = "Allowed values are LATEST, TRIM_HORIZON or AT_TIMESTAMP."
-  # }
 }
 
 variable "cron_config" {
@@ -218,9 +158,9 @@ variable "cron_config" {
 
 variable "s3_source_config" {
   type = object({
-    bucket  = string
-    key     = string
-    version = optional(string)
+    bucket         = string
+    key            = string
+    object_version = optional(string)
   })
   default = null
 }

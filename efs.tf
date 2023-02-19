@@ -1,7 +1,7 @@
 resource "aws_efs_file_system" "efs_for_lambda" {
   count = var.efs_config == null ? 0 : 1
   tags = {
-    Name = var.efs_config.name == null ? "${var.config.function_name}_efs" : var.efs_config.name
+    Name = try("${var.config.function_name}_efs", var.efs_config.name)
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_efs_access_point" "access_point_for_lambda" {
   }
 
   tags = {
-    Name = var.efs_config.name == null ? "${var.config.function_name}_efs" : var.efs_config.name
+    Name = try("${var.config.function_name}_efs", var.efs_config.name)
   }
 }
 

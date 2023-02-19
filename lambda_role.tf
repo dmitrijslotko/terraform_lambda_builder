@@ -30,16 +30,15 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
               "logs:CreateLogStream",
               "logs:PutLogEvents"
             ],
-            "Resource" : "arn:aws:logs:${local.region}:${local.account_id}:log-group:${aws_cloudwatch_log_group.log[0].name}:*",
+            "Resource" : "${aws_cloudwatch_log_group.log[0].arn}/*",
             "Effect" : "Allow"
           }]
       })
     }
-
   }
 
   dynamic "inline_policy" {
-    for_each = var.vpc_config != null ? [] : ["a sigle element to trigger the block"]
+    for_each = var.vpc_config == null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "vpc_access_execution_role"
       policy = jsonencode(
@@ -61,5 +60,51 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
       })
     }
   }
-}
 
+  dynamic "inline_policy" {
+    for_each = var.sqs_event_trigger == null ? [] : ["a sigle element to trigger the block"]
+
+    content {
+      name = "sqs_trigger"
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Resource" : var.sqs_event_trigger.sqs_arn
+            }
+          ]
+      })
+    }
+  }
+
+  dynamic "inline_policy" {
+    for_each = var.kinesis_event_trigger == null ? [] : ["a sigle element to trigger the block"]
+
+    content {
+      name = "kinesis_trigger"
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams"
+              ],
+              "Resource" : var.kinesis_event_trigger.kinesis_arn
+            }
+          ]
+      })
+    }
+  }
+}

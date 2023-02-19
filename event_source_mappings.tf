@@ -1,8 +1,4 @@
-# resource "aws_lambda_event_source_mapping" "sqs" {
-#   count            = var.sqs_source_arn == null ? 0 : 1
-#   event_source_arn = var.sqs_source_arn
-#   function_name    = local.function_name
-# }
+
 
 # resource "aws_lambda_event_source_mapping" "dynamodb" {
 #   count             = var.dynamodb_stream_arn == null ? 0 : 1

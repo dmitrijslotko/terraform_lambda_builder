@@ -1,8 +1,8 @@
 resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
-  count               = var.alarm_config == null ? 0 : 1
+  count               = try(var.alarm_config.type == "anomaly_detection" ? 1 : 0, 0)
   alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.priority}_${var.config.function_name}" : var.alarm_config.name
-  alarm_actions       = [var.alarm_config.sns_topic]
-  ok_actions          = [var.alarm_config.sns_topic]
+  alarm_actions       = var.alarm_config.alarm_actions
+  ok_actions          = var.alarm_config.ok_actions
   comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
   treat_missing_data  = var.alarm_config.treat_missing_data
   threshold_metric_id = "ad1"
@@ -94,11 +94,11 @@ resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "error_detection" {
-  count               = try(var.alarm_config != null && var.alarm_config.type == "error_detection" ? 1 : 0, 0)
+  count               = try(var.alarm_config.type == "error_detection" ? 1 : 0, 0)
   comparison_operator = "GreaterThanThreshold"
-  alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.alarm_priority}_${var.config.function_name}" : var.alarm_config.name
-  alarm_actions       = [var.alarm_config.sns_topic]
-  ok_actions          = [var.alarm_config.sns_topic]
+  alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.priority}_${var.config.function_name}" : var.alarm_config.name
+  alarm_actions       = var.alarm_config.alarm_actions
+  ok_actions          = var.alarm_config.ok_actions
   treat_missing_data  = var.alarm_config.treat_missing_data
   threshold           = "0"
   datapoints_to_alarm = var.alarm_config.datapoints_to_alarm
@@ -137,3 +137,4 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
     return_data = "true"
   }
 }
+

@@ -12,8 +12,8 @@ resource "aws_lambda_function" "lambda" {
   publish           = var.config.publish || var.alias_config != null
   s3_bucket         = try(var.s3_source_config.bucket, null)
   s3_key            = try(var.s3_source_config.key, null)
-  s3_object_version = try(var.s3_source_config.version, null)
-  architectures     = [var.config.arhitecture]
+  s3_object_version = try(var.s3_source_config.object_version, null)
+  architectures     = [var.config.architecture]
   ephemeral_storage {
     size = var.config.ephemeral_storage
   }
@@ -21,7 +21,7 @@ resource "aws_lambda_function" "lambda" {
   dynamic "environment" {
     for_each = var.config.environment_variables != null || var.config.layers != null || var.efs_config != null ? ["a sigle element to trigger the block"] : []
     content {
-      variables = merge(var.environment_variables, var.efs_config != null ? { local_mount_path : local.local_mount_path } : {}, var.layers != null ? { layer_prefix : local.layer_prefix } : {})
+      variables = merge(var.config.environment_variables, var.efs_config != null ? { local_mount_path : var.efs_config.mount_path } : {}, var.config.layers != null ? { layer_prefix : local.layer_prefix } : {})
     }
   }
 
