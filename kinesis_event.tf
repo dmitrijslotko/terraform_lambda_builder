@@ -9,7 +9,7 @@ resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
   maximum_record_age_in_seconds      = var.kinesis_event_trigger.maximum_record_age_in_seconds
   maximum_retry_attempts             = var.kinesis_event_trigger.maximum_retry_attempts
   parallelization_factor             = var.kinesis_event_trigger.parallelization_factor
-  tumbling_window_in_seconds         = var.kinesis_event_trigger.tumbling_window_in_seconds
+  tumbling_window_in_seconds         = var.kinesis_event_trigger.filter_criteria_pattern == null ? var.kinesis_event_trigger.tumbling_window_in_seconds : 0
   starting_position_timestamp        = var.kinesis_event_trigger.starting_position_timestamp
   bisect_batch_on_function_error     = var.kinesis_event_trigger.bisect_batch_on_function_error
   function_response_types            = var.kinesis_event_trigger.function_response_types
