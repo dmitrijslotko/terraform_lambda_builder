@@ -119,8 +119,8 @@ variable "sqs_event_trigger" {
     sqs_arn                            = string,
     enabled                            = optional(bool, true),
     batch_size                         = optional(number, 10),
-    filter_criteria                    = optional(string, null),
-    maximum_batching_window_in_seconds = optional(number, 0),
+    filter_criteria_pattern            = optional(string, null),
+    maximum_batching_window_in_seconds = optional(number, 20),
     function_response_types            = optional(list(string), null),
     scaling_config                     = optional(string, null),
   })
@@ -130,6 +130,26 @@ variable "sqs_event_trigger" {
 variable "kinesis_event_trigger" {
   type = object({
     kinesis_arn                        = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 500),
+    bisect_batch_on_function_error     = optional(bool, false),
+    on_failure_destination_sqs_arn     = optional(string, null),
+    maximum_record_age_in_seconds      = optional(number, 604800),
+    maximum_retry_attempts             = optional(number, 2),
+    starting_position                  = optional(string, "LATEST"),
+    maximum_batching_window_in_seconds = optional(number, 0),
+    parallelization_factor             = optional(number, 1),
+    function_response_types            = optional(list(string), null),
+    starting_position_timestamp        = optional(string, null),
+    tumbling_window_in_seconds         = optional(number, 60),
+    filter_criteria_pattern            = optional(string, null),
+  })
+  default = null
+}
+
+variable "dynamo_event_trigger" {
+  type = object({
+    dynamo_stream_arn                  = string,
     enabled                            = optional(bool, true),
     batch_size                         = optional(number, 500),
     bisect_batch_on_function_error     = optional(bool, false),

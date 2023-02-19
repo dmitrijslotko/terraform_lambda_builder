@@ -7,12 +7,6 @@
 #   starting_position = var.dynamodb_stream_starting_position
 # }
 
-# resource "aws_lambda_event_source_mapping" "kinesis" {
-#   count             = var.kinesis_stream_arn == null ? 0 : 1
-#   event_source_arn  = var.kinesis_stream_arn
-#   function_name     = local.function_name
-#   starting_position = var.kinesis_stream_starting_position
-# }
 
 # resource "aws_s3_bucket_notification" "bucket_notification" {
 #   count  = var.s3_notification_bucket_name == null ? 0 : 1

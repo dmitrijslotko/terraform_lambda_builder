@@ -19,6 +19,29 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   })
 
   dynamic "inline_policy" {
+    for_each = var.dynamo_event_trigger == null ? [] : ["a sigle element to trigger the block"]
+    content {
+      name = "dynamodb_access_execution_role"
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource" : var.dynamo_event_trigger.dynamo_stream_arn
+            }
+          ]
+      })
+    }
+  }
+
+  dynamic "inline_policy" {
     for_each = var.log_group_config == null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "cloudwatch_logs"
@@ -30,7 +53,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
               "logs:CreateLogStream",
               "logs:PutLogEvents"
             ],
-            "Resource" : "${aws_cloudwatch_log_group.log[0].arn}/*",
+            "Resource" : "${aws_cloudwatch_log_group.log[0].arn}:*",
             "Effect" : "Allow"
           }]
       })

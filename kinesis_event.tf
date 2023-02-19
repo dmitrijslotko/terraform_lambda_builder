@@ -32,3 +32,11 @@ resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
     }
   }
 }
+
+resource "aws_lambda_permission" "allow_kinesis_stream" {
+  statement_id  = "kinesis_permissions"
+  action        = "lambda:InvokeFunction"
+  function_name = local.function_name
+  principal     = "kinesis.amazonaws.com"
+  source_arn    = var.kinesis_event_trigger.kinesis_arn
+}
