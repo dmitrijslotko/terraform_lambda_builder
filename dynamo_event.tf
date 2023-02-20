@@ -34,6 +34,7 @@ resource "aws_lambda_event_source_mapping" "dynamo_trigger" {
 }
 
 resource "aws_lambda_permission" "allow_dynamodb_stream" {
+  count         = var.dynamo_event_trigger == null ? 0 : 1
   statement_id  = "dynamodb_permissions"
   action        = "lambda:InvokeFunction"
   function_name = local.function_name

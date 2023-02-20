@@ -34,6 +34,7 @@ resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
 }
 
 resource "aws_lambda_permission" "allow_kinesis_stream" {
+  count         = var.kinesis_event_trigger == null ? 0 : 1
   statement_id  = "kinesis_permissions"
   action        = "lambda:InvokeFunction"
   function_name = local.function_name
