@@ -141,10 +141,10 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
 resource "aws_cloudwatch_metric_alarm" "daily_check" {
   count               = try(var.alarm_config.type == "daily_check" ? 1 : 0, 0)
   alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.priority}_${var.config.function_name}" : var.alarm_config.name
-  threshold           = 1
-  evaluation_periods  = 24
-  datapoints_to_alarm = 1
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 0
+  evaluation_periods  = 288
+  datapoints_to_alarm = 288
+  comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "breaching"
 
   metric_query {
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "daily_check" {
     metric {
       metric_name = "Throttles"
       namespace   = "AWS/Lambda"
-      period      = 3600
+      period      = 300
       stat        = "Sum"
       dimensions = {
         FunctionName = var.config.function_name
@@ -165,26 +165,13 @@ resource "aws_cloudwatch_metric_alarm" "daily_check" {
     metric {
       metric_name = "Errors"
       namespace   = "AWS/Lambda"
-      period      = 3600
+      period      = 300
       stat        = "Sum"
       dimensions = {
         FunctionName = var.config.function_name
       }
     }
   }
-
-  # metric_query {
-  #   id = "m3"
-  #   metric {
-  #     metric_name = "Invocations"
-  #     namespace   = "AWS/Lambda"
-  #     period      = 60
-  #     stat        = "Sum"
-  #     dimensions = {
-  #       FunctionName = var.config.function_name
-  #     }
-  #   }
-  # }
 
   metric_query {
     id          = "e1"
