@@ -82,21 +82,43 @@ variable "alias_config" {
 
 variable "alarm_config" {
   type = object({
-    type                = optional(string, "error_detection"),
-    period              = optional(number, 60),
-    actions_enabled     = optional(bool, true),
-    datapoints_to_alarm = optional(number, 1),
-    evaluation_periods  = optional(number, 5),
-    normal_deviation    = optional(number, 2),
-    name                = optional(string, null),
-    treat_missing_data  = optional(string, "breaching"),
-    statistic           = optional(string, "Sum"),
-    comparison_operator = optional(string, "GreaterThanOrEqualToThreshold"),
-    threshold           = optional(number, 1),
-    description         = optional(string, null),
-    ok_actions          = optional(list(string), null),
-    alarm_actions       = optional(list(string), null),
-    priority            = optional(string, "P2")
+    type                                 = optional(string, "error_detection"),
+    period                               = optional(number, 60),
+    actions_enabled                      = optional(bool, true),
+    datapoints_to_alarm                  = optional(number, 1),
+    evaluation_periods                   = optional(number, 5),
+    normal_deviation                     = optional(number, 2),
+    name                                 = optional(string, null),
+    treat_missing_data                   = optional(string, "breaching"),
+    statistic                            = optional(string, "Sum"),
+    comparison_operator                  = optional(string, "GreaterThanThreshold"),
+    threshold                            = optional(number, 1),
+    description                          = optional(string, null),
+    ok_actions                           = optional(list(string), null),
+    alarm_actions                        = optional(list(string), null),
+    priority                             = optional(string, "P2"),
+    metric_name                          = optional(string, null),
+    namespace                            = optional(string, "AWS/Lambda"),
+    dimensions                           = optional(map(string), null),
+    insuficient_data_actions             = optional(list(string), null),
+    unit                                 = optional(string, "Count"),
+    extended_statistic                   = optional(string, null),
+    evaluate_low_sample_count_percentile = optional(string, null),
+    threshold_metric_id                  = optional(string, null),
+    metric_query = optional(list(object({
+      id          = string
+      expression  = string
+      label       = string
+      return_data = bool
+      metric = object({
+        metric_name = string
+        namespace   = string
+        dimensions  = optional(map(string), null)
+        period      = optional(number, 60)
+        stat        = optional(string, "Average")
+        unit        = optional(string, null)
+      })
+    })), null)
   })
   default = null
 
@@ -105,12 +127,12 @@ variable "alarm_config" {
     error_message = "The priority should be P1 or P2."
   }
   validation {
-    condition     = try(var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection", true)
+    condition     = try(var.alarm_config.type == "daily_check" || var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection" || var.alarm_config.type == "custom", true)
     error_message = "The values should be error_detection or anomaly_detection."
   }
 
   validation {
-    condition     = try(var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching", true)
+    condition     = try(var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching" || var.alarm_config.treat_missing_data == "ignore", true)
     error_message = "The values should be missing, notBreaching or breaching."
   }
 }

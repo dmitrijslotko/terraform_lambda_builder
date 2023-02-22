@@ -138,3 +138,95 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "daily_check" {
+  count               = try(var.alarm_config.type == "daily_check" ? 1 : 0, 0)
+  alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.priority}_${var.config.function_name}" : var.alarm_config.name
+  threshold           = 1
+  evaluation_periods  = 24
+  datapoints_to_alarm = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  treat_missing_data  = "breaching"
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "Throttles"
+      namespace   = "AWS/Lambda"
+      period      = 3600
+      stat        = "Sum"
+      dimensions = {
+        FunctionName = var.config.function_name
+      }
+    }
+  }
+
+  metric_query {
+    id = "m2"
+    metric {
+      metric_name = "Errors"
+      namespace   = "AWS/Lambda"
+      period      = 3600
+      stat        = "Sum"
+      dimensions = {
+        FunctionName = var.config.function_name
+      }
+    }
+  }
+
+  # metric_query {
+  #   id = "m3"
+  #   metric {
+  #     metric_name = "Invocations"
+  #     namespace   = "AWS/Lambda"
+  #     period      = 60
+  #     stat        = "Sum"
+  #     dimensions = {
+  #       FunctionName = var.config.function_name
+  #     }
+  #   }
+  # }
+
+  metric_query {
+    id          = "e1"
+    expression  = "m1 + m2"
+    return_data = "true"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "custom" {
+  count               = try(var.alarm_config.type == "custom" ? 1 : 0, 0)
+  comparison_operator = var.alarm_config.comparison_operator
+  alarm_name          = var.alarm_config.name == null ? "${var.alarm_config.priority}_${var.config.function_name}" : var.alarm_config.name
+  alarm_actions       = var.alarm_config.alarm_actions
+  ok_actions          = var.alarm_config.ok_actions
+  treat_missing_data  = var.alarm_config.treat_missing_data
+  threshold           = var.alarm_config.threshold
+  datapoints_to_alarm = var.alarm_config.datapoints_to_alarm
+  evaluation_periods  = var.alarm_config.evaluation_periods
+  actions_enabled     = var.alarm_config.actions_enabled
+  metric_name         = var.alarm_config.metric_name
+  namespace           = var.alarm_config.namespace
+  statistic           = var.alarm_config.statistic
+  period              = var.alarm_config.period
+  threshold_metric_id = var.alarm_config.threshold_metric_id
+  dimensions          = var.alarm_config.dimensions
+  dynamic "metric_query" {
+    for_each = var.alarm_config.metric_query == null ? [] : var.alarm_config.metric_query
+    content {
+      id          = for_each.value.id
+      expression  = for_each.value.expression
+      return_data = for_each.value.return_data
+      label       = for_each.value.label
+      dynamic "metric" {
+        for_each = metric_query.value.metric
+        content {
+          metric_name = metric.metric_name
+          namespace   = metric.namespace
+          period      = metric.period
+          stat        = metric.stat
+          dimensions  = metric.dimensions
+        }
+      }
+    }
+  }
+}
