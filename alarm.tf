@@ -146,6 +146,8 @@ resource "aws_cloudwatch_metric_alarm" "daily_check" {
   datapoints_to_alarm = 288
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "breaching"
+  alarm_actions       = var.alarm_config.alarm_actions
+  ok_actions          = var.alarm_config.ok_actions
 
   metric_query {
     id = "m1"
