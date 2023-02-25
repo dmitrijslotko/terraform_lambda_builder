@@ -170,6 +170,18 @@ variable "kinesis_event_trigger" {
   default = null
 }
 
+variable "s3_event_trigger" {
+  type = object(
+    {
+      bucket_name   = string
+      events        = list(string)
+      filter_prefix = optional(string, null)
+      filter_suffix = optional(string, null)
+    }
+  )
+  default = null
+}
+
 variable "dynamo_event_trigger" {
   type = object({
     dynamo_stream_arn                  = string,

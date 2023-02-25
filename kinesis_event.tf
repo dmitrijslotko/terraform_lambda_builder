@@ -1,7 +1,7 @@
 resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
   count                              = var.kinesis_event_trigger == null ? 0 : 1
   event_source_arn                   = var.kinesis_event_trigger.kinesis_arn
-  function_name                      = local.function_name
+  function_name                      = local.arn
   starting_position                  = var.kinesis_event_trigger.starting_position
   batch_size                         = var.kinesis_event_trigger.batch_size
   enabled                            = var.kinesis_event_trigger.enabled
@@ -37,7 +37,7 @@ resource "aws_lambda_permission" "allow_kinesis_stream" {
   count         = var.kinesis_event_trigger == null ? 0 : 1
   statement_id  = "kinesis_permissions"
   action        = "lambda:InvokeFunction"
-  function_name = local.function_name
+  function_name = local.arn
   principal     = "kinesis.amazonaws.com"
   source_arn    = var.kinesis_event_trigger.kinesis_arn
 }
