@@ -96,6 +96,7 @@ variable "alarm_config" {
     description                          = optional(string, null),
     ok_actions                           = optional(list(string), null),
     alarm_actions                        = optional(list(string), null),
+    sns_topic_arn                        = optional(string, null)
     priority                             = optional(string, "P2"),
     metric_name                          = optional(string, null),
     namespace                            = optional(string, "AWS/Lambda"),
@@ -146,6 +147,13 @@ variable "sqs_event_trigger" {
     maximum_batching_window_in_seconds = optional(number, 20),
     function_response_types            = optional(list(string), null),
     scaling_config                     = optional(string, null),
+  })
+  default = null
+}
+
+variable "sns_event_config" {
+  type = object({
+    topic_arn = string,
   })
   default = null
 }

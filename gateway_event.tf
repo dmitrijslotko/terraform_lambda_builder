@@ -15,16 +15,3 @@
 #   principal     = "apigateway.amazonaws.com"
 #   source_arn    = var.api_gw_source_arn
 # }
-
-# resource "aws_lambda_permission" "s3_permissions" {
-#   count         = var.s3_notification_bucket_name == null ? 0 : 1
-#   statement_id  = "s3_permissions"
-#   action        = "lambda:InvokeFunction"
-#   function_name = local.function_name
-#   principal     = "s3.amazonaws.com"
-#   source_arn    = "arn:aws:s3:::${var.s3_notification_bucket_name}"
-# }
-
-
-
-
