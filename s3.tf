@@ -13,6 +13,7 @@ data "archive_file" "archive" {
   output_path = "${path.module}/.build/${var.config.function_name}.zip"
 }
 
+
 resource "aws_s3_bucket_notification" "bucket_notification" {
   count  = var.s3_event_trigger == null ? 0 : 1
   bucket = var.s3_event_trigger.bucket_name
@@ -40,7 +41,8 @@ resource "aws_lambda_permission" "s3_permissions" {
   count         = var.s3_event_trigger == null ? 0 : 1
   statement_id  = "s3_permissions"
   action        = "lambda:InvokeFunction"
-  function_name = local.arn
+  function_name = aws_lambda_function.lambda.function_name
+  qualifier     = try(aws_lambda_alias.lambda_alias[0].name, null)
   principal     = "s3.amazonaws.com"
   source_arn    = "arn:aws:s3:::${var.s3_event_trigger.bucket_name}"
 }

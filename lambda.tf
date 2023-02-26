@@ -21,7 +21,7 @@ resource "aws_lambda_function" "lambda" {
   dynamic "environment" {
     for_each = var.config.environment_variables != null || var.config.layers != null || var.efs_config != null ? ["a sigle element to trigger the block"] : []
     content {
-      variables = merge(var.config.environment_variables, var.efs_config != null ? { local_mount_path : var.efs_config.mount_path } : {}, var.config.layers != null ? { layer_prefix : local.layer_prefix } : {})
+      variables = merge(var.config.environment_variables, var.efs_config != null ? { local_mount_path : var.efs_config.mount_path } : {}, var.config.layers != null ? { layer_prefix : var.config.layer_prefix } : {})
     }
   }
 

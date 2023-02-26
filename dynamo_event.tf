@@ -1,7 +1,7 @@
 resource "aws_lambda_event_source_mapping" "dynamo_trigger" {
-  count                              = var.dynamo_event_trigger == null ? 0 : 1
+  count                              = var.dynamo_event_trigger == null ? 0 : length(local.arns)
   event_source_arn                   = var.dynamo_event_trigger.dynamo_stream_arn
-  function_name                      = local.arn
+  function_name                      = local.arns[count.index]
   starting_position                  = var.dynamo_event_trigger.starting_position
   batch_size                         = var.dynamo_event_trigger.batch_size
   enabled                            = var.dynamo_event_trigger.enabled
@@ -34,10 +34,11 @@ resource "aws_lambda_event_source_mapping" "dynamo_trigger" {
 }
 
 resource "aws_lambda_permission" "allow_dynamodb_stream" {
-  count         = var.dynamo_event_trigger == null ? 0 : 1
+  count         = var.dynamo_event_trigger == null ? 0 : length(local.alias_and_stable_version)
   statement_id  = "dynamodb_permissions"
   action        = "lambda:InvokeFunction"
-  function_name = local.arn
+  function_name = aws_lambda_function.lambda.function_name
+  qualifier     = local.alias_and_stable_version[count.index]
   principal     = "dynamodb.amazonaws.com"
   source_arn    = var.dynamo_event_trigger.dynamo_stream_arn
 }

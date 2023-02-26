@@ -7,6 +7,7 @@ variable "config" {
     memory_size           = optional(number, 128),
     handler               = optional(string, "index.handler"),
     layers                = optional(list(string), null),
+    layer_prefix          = optional(string, "/opt/nodejs/")
     runtime               = optional(string, "nodejs18.x"),
     environment_variables = optional(map(string), null),
     architecture          = optional(string, "arm64"),
@@ -71,11 +72,12 @@ variable "vpc_config" {
 
 variable "alias_config" {
   type = object({
-    name                   = optional(string, "live")
-    description            = optional(string, "alias for live version"),
-    stable_version_weights = optional(number, 1),
-    stable_version         = optional(string, null),
-    versions_to_keep       = optional(number, 5),
+    name                      = optional(string, "live")
+    description               = optional(string, "alias for live version"),
+    stable_version_weights    = optional(number, 1),
+    stable_version            = optional(string, null),
+    versions_to_keep          = optional(number, null),
+    force_delete_old_versions = optional(bool, false)
   })
   default = null
 }
