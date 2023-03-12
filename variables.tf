@@ -43,6 +43,13 @@ variable "config" {
   }
 }
 
+variable "vpc_config" {
+  type = object({
+    subnet_ids         = list(string)
+    security_group_ids = list(string)
+  })
+  default = null
+}
 variable "efs_config" {
   type = object({
     name               = optional(string, null)
@@ -60,14 +67,6 @@ variable "log_group_config" {
   default = {
     retention_in_days = 30,
   }
-}
-
-variable "vpc_config" {
-  type = object({
-    subnet_ids         = list(string)
-    security_group_ids = list(string)
-  })
-  default = null
 }
 
 variable "alias_config" {
@@ -131,13 +130,31 @@ variable "alarm_config" {
   }
   validation {
     condition     = try(var.alarm_config.type == "daily_check" || var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection" || var.alarm_config.type == "custom", true)
-    error_message = "The values should be error_detection or anomaly_detection."
+    error_message = "The values should be error_detection or anomaly_detection or custom"
   }
 
   validation {
     condition     = try(var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching" || var.alarm_config.treat_missing_data == "ignore", true)
     error_message = "The values should be missing, notBreaching or breaching."
   }
+}
+
+variable "s3_source_config" {
+  type = object({
+    bucket         = string
+    key            = string
+    object_version = optional(string)
+  })
+  default = null
+}
+
+variable "cron_config" {
+  type = object({
+    enabled         = optional(bool, true)
+    input           = string
+    cron_expression = string
+  })
+  default = null
 }
 
 variable "sqs_event_trigger" {
@@ -212,20 +229,19 @@ variable "dynamo_event_trigger" {
   default = null
 }
 
-variable "cron_config" {
+variable "api_event_trigger" {
   type = object({
-    enabled         = optional(bool, true)
-    input           = string
-    cron_expression = string
+    api_id        = string
+    http_method   = string
+    stage         = string
+    resource_path = string
   })
   default = null
 }
 
-variable "s3_source_config" {
+variable "appsync_event_trigger" {
   type = object({
-    bucket         = string
-    key            = string
-    object_version = optional(string)
+    api_id = string
   })
   default = null
 }
