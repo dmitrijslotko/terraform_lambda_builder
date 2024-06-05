@@ -51,25 +51,13 @@ To pull module using SSH key. Does not work with Gitlab pipeline.
 
 ```hcl
 module "lambda_function" {
-  source = "git@gitlab.com:1nce-tech/data-analytics/terraform_lambda_builder?ref=x.x.x"
+  source = "source = "github.com/dmitrijslotko/terraform_lambda_builder?ref=vX.X.X"
 
   # ... other variables ...
 }
 ```
 
 ### Example 2
-
-To pull module using HTTPS. Works with Gitlab pipeline.
-
-```hcl
-module "lambda_function" {
-  source = "git::https://gitlab.com/1nce-tech/data-analytics/terraform_lambda_builder.git?ref=x.x.x"
-
-  # ... other variables ...
-}
-```
-
-### Example 3
 
 ```
    root_directory/
