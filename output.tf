@@ -3,11 +3,11 @@ output "lambda" {
 }
 
 output "alias" {
-  value = var.alias != null ? aws_lambda_alias.lambda_alias[0] : null
+  value = try(aws_lambda_alias.lambda_alias[0], null)
 }
 
 output "role" {
-  value = var.role_arn != "" ? data.aws_iam_role.external_role[0] : aws_iam_role.lambda_builder_iam_role[0]
+  value = var.config.role_arn == null ? aws_iam_role.lambda_builder_iam_role[0] : null
 }
 
 output "arn" {
@@ -15,7 +15,7 @@ output "arn" {
 }
 
 output "invoke_arn" {
-  value = var.alias != null ? aws_lambda_alias.lambda_alias[0].invoke_arn : aws_lambda_function.lambda.invoke_arn
+  value = local.invoke_arn
 }
 
 output "function_name" {

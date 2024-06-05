@@ -1,275 +1,326 @@
-# MANDATORY FIELDS
+variable "config" {
+  type = object({
+    filename              = optional(string, null),
+    function_name         = string
+    description           = optional(string, "created by a lambda builder"),
+    timeout               = optional(number, 30),
+    memory_size           = optional(number, 128),
+    handler               = optional(string, "index.handler"),
+    layers                = optional(list(string), null),
+    runtime               = optional(string, "nodejs20.x"),
+    environment_variables = optional(map(string), null),
+    architecture          = optional(string, "arm64"),
+    role_arn              = optional(string, null),
+    ephemeral_storage     = optional(number, 512),
+    publish               = optional(bool, false),
+    force_deploy          = optional(bool, false),
+    role_policy           = optional(string, null),
+  })
 
-variable "filename" {
-  type = string
-}
-
-variable "function_name" {
-  type = string
   validation {
-    condition     = length(var.function_name) <= 64
+    condition     = length(var.config.function_name) <= 64
     error_message = "The name of the Lambda function, up to 64 characters in length."
   }
-}
-# MANDATORY FIELDS
 
-# ALARM FIELDS
-variable "add_alarm" {
-  type    = bool
-  default = false
-}
-
-variable "sns_topic" {
-  type    = string
-  default = null
-}
-
-variable "actions_enabled" {
-  type    = bool
-  default = true
-}
-
-variable "datapoints_to_alarm" {
-  type    = number
-  default = 1
-}
-
-variable "evaluation_periods" {
-  type    = number
-  default = 5
-}
-
-variable "period" {
-  type    = number
-  default = 60
-}
-
-variable "normal_deviation" {
-  type    = number
-  default = 2
-}
-
-variable "alarm_type" {
-  type    = string
-  default = "error_detection"
   validation {
-    condition     = var.alarm_type == "error_detection" || var.alarm_type == "anomaly_detection"
-    error_message = "The values should be error_detection or anomaly_detection."
-  }
-}
-
-variable "treat_missing_data" {
-  type    = string
-  default = "notBreaching"
-  validation {
-    condition     = var.treat_missing_data == "notBreaching" || var.treat_missing_data == "breaching"
-    error_message = "The values should be breaching or notBreaching."
-  }
-}
-
-variable "alarm_priority" {
-  type    = string
-  default = "P2"
-  validation {
-    condition     = var.alarm_priority == "P1" || var.alarm_priority == "P2"
-    error_message = "The priority should be P1 or P2."
-  }
-}
-# ALARM FIELDS
-
-# OPTIONAL FIELDS
-variable "handler" {
-  type    = string
-  default = "index.handler"
-}
-
-variable "role_arn" {
-  type    = string
-  default = ""
-}
-
-variable "runtime" {
-  type    = string
-  default = "nodejs16.x"
-}
-variable "lambda_retention_in_days" {
-  type    = number
-  default = 30
-}
-variable "timeout" {
-  type    = number
-  default = 30
-  validation {
-    condition     = var.timeout <= 900
-    error_message = "Lambda timeout variable cannot be more than 900 seconds (15 minutes)."
-  }
-}
-variable "layers" {
-  type        = list(string)
-  default     = null
-  description = "expects to receive a list of layer arns"
-}
-
-variable "memory_size" {
-  type    = number
-  default = 256
-  validation {
-    condition     = var.memory_size >= 256 || var.memory_size <= 10240
-    error_message = "Lambda's memory should be between 256 and 10240."
-  }
-}
-
-variable "ephemeral_storage" {
-  type    = number
-  default = 512
-  validation {
-    condition     = var.ephemeral_storage >= 512 || var.ephemeral_storage <= 10240
+    condition     = var.config.ephemeral_storage >= 512 || var.config.ephemeral_storage <= 10240
     error_message = "Lambda's ephemeral storage should be between 512 and 10240."
   }
-}
 
-variable "environment_variables" {
-  type    = map(string)
-  default = null
-}
-
-# OPTIONAL FIELDS
-
-
-# VPC FIELDS
-variable "subnet_ids" {
-  type    = list(string)
-  default = null
-}
-
-variable "security_group_ids" {
-  type    = list(string)
-  default = null
-}
-
-# VPC FIELDS
-
-# EFS FIELD
-variable "add_efs" {
-  type    = bool
-  default = false
-}
-
-# EFS FIELD
-
-# ALIAS FIELDS
-variable "alias" {
-  type    = string
-  default = null
-}
-
-variable "stable_version_weights" {
-  type    = number
-  default = 1
   validation {
-    condition     = var.stable_version_weights >= 0 && var.stable_version_weights <= 1
-    error_message = "Weight should be between 0 and 1."
+    condition     = var.config.timeout >= 1 && var.config.timeout <= 900
+    error_message = "Timeout should be between 1 and 900."
+  }
+
+  validation {
+    condition     = var.config.memory_size >= 128 && var.config.memory_size <= 10240
+    error_message = "Memory size should be between 128 and 10240."
+  }
+
+  validation {
+    condition     = var.config.architecture == "arm64" || var.config.architecture == "x86_64"
+    error_message = "Architecture should be either arm64 or x86_64."
   }
 }
 
-variable "stable_version" {
-  type    = number
+variable "vpc_config" {
+  type = object({
+    subnet_ids         = list(string)
+    security_group_ids = list(string)
+  })
+  default = null
+}
+variable "efs_config" {
+  type = object({
+    name               = optional(string, null)
+    mount_path         = optional(string, "/mnt/efs")
+    subnet_ids         = list(string)
+    security_group_ids = list(string)
+  })
   default = null
 }
 
-variable "versions_to_keep" {
-  type    = number
-  default = null
-}
-
-# ALIAS FIELDS
-
-# LAMBDA PERMISSIONS
-
-variable "appsync_source_arn" {
-  type    = string
-  default = null
-}
-
-variable "api_gw_source_arn" {
-  type    = string
-  default = null
-}
-
-variable "s3_notification_bucket_name" {
-  type    = string
-  default = null
-}
-
-variable "s3_notification_events" {
-  type    = list(string)
-  default = null
-}
-
-variable "s3_notification_filter_prefix" {
-  type    = string
-  default = null
-}
-
-variable "s3_notification_filter_suffix" {
-  type    = string
-  default = null
-}
-
-variable "sqs_source_arn" {
-  type    = string
-  default = null
-}
-
-# LAMBDA PERMISSIONS
-
-# EVENT SOURCE MAPPINGS
-
-variable "dynamodb_stream_arn" {
-  type    = string
-  default = null
-}
-
-variable "dynamodb_stream_starting_position" {
-  type    = string
-  default = "LATEST"
-  validation {
-    condition     = var.dynamodb_stream_starting_position != "LATEST" || var.dynamodb_stream_starting_position != "TRIM_HORIZON"
-    error_message = "Allowed values are LATEST or TRIM_HORIZON."
+variable "log_group_config" {
+  type = object({
+    retention_in_days = number,
+  })
+  default = {
+    retention_in_days = 7,
   }
 }
 
-variable "kinesis_stream_arn" {
-  type    = string
+variable "docker_config" {
+  type = object({
+    repository_url       = optional(string, null)
+    dockerfile_path      = string
+    image_tag_mutability = optional(string, "MUTABLE")
+    platform             = optional(string, "arm64")
+    os                   = optional(string, "linux")
+  })
   default = null
 }
 
-variable "kinesis_stream_starting_position" {
-  type    = string
-  default = "LATEST"
+variable "alias_config" {
+  type = object({
+    name                      = optional(string, "live")
+    description               = optional(string, "alias for live version"),
+    stable_version_weights    = optional(number, 1),
+    stable_version            = optional(string, null),
+    versions_to_keep          = optional(number, null),
+    force_delete_old_versions = optional(bool, false)
+  })
+  default = null
+}
+
+variable "alarm_config" {
+  type = object({
+    type                                 = optional(string, "error_detection"),
+    period                               = optional(number, 60),
+    actions_enabled                      = optional(bool, true),
+    datapoints_to_alarm                  = optional(number, 1),
+    evaluation_periods                   = optional(number, 5),
+    normal_deviation                     = optional(number, 2),
+    name                                 = optional(string, null),
+    treat_missing_data                   = optional(string, "breaching"),
+    statistic                            = optional(string, "Sum"),
+    comparison_operator                  = optional(string, "GreaterThanThreshold"),
+    threshold                            = optional(number, 1),
+    description                          = optional(string, null),
+    ok_actions                           = optional(list(string), null),
+    alarm_actions                        = optional(list(string), null),
+    sns_topic_arn                        = string,
+    priority                             = string,
+    metric_name                          = optional(string, null),
+    namespace                            = optional(string, "AWS/Lambda"),
+    dimensions                           = optional(map(string), null),
+    insuficient_data_actions             = optional(list(string), null),
+    unit                                 = optional(string, "Count"),
+    extended_statistic                   = optional(string, null),
+    evaluate_low_sample_count_percentile = optional(string, null),
+    threshold_metric_id                  = optional(string, null),
+    metric_query = optional(list(object({
+      id          = string
+      expression  = string
+      label       = string
+      return_data = bool
+      metric = object({
+        metric_name = string
+        namespace   = string
+        dimensions  = optional(map(string), null)
+        period      = optional(number, 60)
+        stat        = optional(string, "Average")
+        unit        = optional(string, null)
+      })
+    })), null)
+  })
+
   validation {
-    condition     = var.kinesis_stream_starting_position != "LATEST" || var.kinesis_stream_starting_position != "TRIM_HORIZON" || var.kinesis_stream_starting_position != "AT_TIMESTAMP"
-    error_message = "Allowed values are LATEST, TRIM_HORIZON or AT_TIMESTAMP."
+    condition     = try(var.alarm_config.priority == "P1" || var.alarm_config.priority == "P2", true)
+    error_message = "The priority should be P1 or P2."
   }
-}
+  validation {
+    condition     = try(var.alarm_config.type == "daily_check" || var.alarm_config.type == "error_detection" || var.alarm_config.type == "anomaly_detection" || var.alarm_config.type == "custom", true)
+    error_message = "The values should be error_detection or anomaly_detection or custom"
+  }
 
-# EVENT SOURCE MAPPINGS
+  validation {
+    condition     = try(var.alarm_config.treat_missing_data == "missing" || var.alarm_config.treat_missing_data == "notBreaching" || var.alarm_config.treat_missing_data == "breaching" || var.alarm_config.treat_missing_data == "ignore", true)
+    error_message = "The values should be missing, notBreaching or breaching."
+  }
 
-
-# CW EVENT RULE
-
-variable "cw_event_input" {
-  type    = string
   default = null
 }
 
-variable "cw_event_is_enabled" {
-  type    = bool
-  default = true
-}
-
-variable "cw_event_cron_expression" {
-  type    = string
+variable "s3_source_config" {
+  type = object({
+    bucket         = string
+    key            = string
+    object_version = optional(string)
+  })
   default = null
 }
-# CW EVENT RULE
+
+variable "s3_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "cron_config" {
+  type = object({
+    enabled         = optional(string, "ENABLED")
+    input           = string
+    cron_expression = string
+  })
+  default = null
+}
+
+variable "sqs_event_trigger" {
+  type = object({
+    sqs_arn                            = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 10),
+    filter_criteria_pattern            = optional(string, null),
+    maximum_batching_window_in_seconds = optional(number, 20),
+    function_response_types            = optional(list(string), null),
+    maximum_concurrency                = optional(number, 2),
+  })
+  default = null
+}
+
+variable "sqs_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "sns_event_config" {
+  type = object({
+    topic_arn = string,
+  })
+  default = null
+}
+
+variable "kinesis_event_trigger" {
+  type = object({
+    kinesis_arn                        = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 500),
+    bisect_batch_on_function_error     = optional(bool, false),
+    on_failure_destination_sqs_arn     = optional(string, null),
+    maximum_record_age_in_seconds      = optional(number, 604800),
+    maximum_retry_attempts             = optional(number, 2),
+    starting_position                  = optional(string, "LATEST"),
+    maximum_batching_window_in_seconds = optional(number, 0),
+    parallelization_factor             = optional(number, 1),
+    function_response_types            = optional(list(string), null),
+    starting_position_timestamp        = optional(string, null),
+    tumbling_window_in_seconds         = optional(number, 0),
+    filter_criteria_pattern            = optional(string, null),
+  })
+  default = null
+}
+
+variable "kinesis_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "msk_event_trigger" {
+  type = object({
+    cluster_arn       = string,
+    topic             = string,
+    enabled           = optional(bool, true),
+    batch_size        = optional(number, 500),
+    starting_position = optional(string, "LATEST"),
+  })
+  default = null
+}
+
+variable "msk_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "s3_event_trigger" {
+  type = object(
+    {
+      bucket_name   = string
+      events        = list(string)
+      filter_prefix = optional(string, null)
+      filter_suffix = optional(string, null)
+    }
+  )
+  default = null
+}
+
+variable "dynamo_event_trigger" {
+  type = object({
+    dynamo_stream_arn                  = string,
+    enabled                            = optional(bool, true),
+    batch_size                         = optional(number, 500),
+    bisect_batch_on_function_error     = optional(bool, false),
+    on_failure_destination_sqs_arn     = optional(string, null),
+    maximum_record_age_in_seconds      = optional(number, 604800),
+    maximum_retry_attempts             = optional(number, 2),
+    starting_position                  = optional(string, "LATEST"),
+    maximum_batching_window_in_seconds = optional(number, 0),
+    parallelization_factor             = optional(number, 1),
+    function_response_types            = optional(list(string), null),
+    starting_position_timestamp        = optional(string, null),
+    tumbling_window_in_seconds         = optional(number, 0),
+    filter_criteria_pattern            = optional(string, null),
+  })
+  default = null
+}
+
+variable "dynamo_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "api_event_trigger" {
+  type = object({
+    api_id        = string
+    http_method   = string
+    stage         = string
+    resource_path = string
+  })
+  default = null
+}
+
+variable "appsync_event_trigger" {
+  type = object({
+    api_id = string
+  })
+  default = null
+}
+
+variable "lambda_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "step_function_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}
+
+variable "firehose_target_config" {
+  type = object({
+    targets = list(string)
+  })
+  default = null
+}

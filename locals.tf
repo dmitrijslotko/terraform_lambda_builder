@@ -1,13 +1,22 @@
 locals {
   account_id = data.aws_caller_identity.current.account_id
   region     = data.aws_region.current.name
-  # tags             = data.aws_default_tags.tags["APPLICATION"]
-  local_mount_path   = "/mnt/efs"
-  layer_prefix       = "/opt/nodejs/"
-  function_name      = var.alias != null ? aws_lambda_alias.lambda_alias[0].arn : aws_lambda_function.lambda.arn
-  arn                = var.alias != null ? aws_lambda_alias.lambda_alias[0].arn : aws_lambda_function.lambda.arn
-  cw_rule            = var.cw_event_input != null && var.cw_event_cron_expression != null
-  external_role_name = var.role_arn != "" ? split("/", var.role_arn)[1] : ""
+
+  function_name = try(
+    aws_lambda_alias.lambda_alias[0].function_name,
+    aws_lambda_function.lambda.function_name
+  )
+  arn = try(
+    aws_lambda_alias.lambda_alias[0].arn,
+    aws_lambda_function.lambda.version == "$LATEST" || aws_lambda_function.lambda.publish == false ? aws_lambda_function.lambda.arn : "${aws_lambda_function.lambda.arn}:${aws_lambda_function.lambda.version}"
+  )
+  invoke_arn = try(
+    aws_lambda_alias.lambda_alias[0].invoke_arn,
+    aws_lambda_function.lambda.invoke_arn
+  )
+
+  lambda_function_qualifier = try(aws_lambda_alias.lambda_alias[0].name, aws_lambda_function.lambda.version == "$LATEST" || aws_lambda_function.lambda.publish == false ? null : aws_lambda_function.lambda.version)
+  layer_prefix              = strcontains(var.config.runtime, "nodejs") ? "/opt/nodejs/" : strcontains(var.config.runtime, "python") ? "/opt/python/" : "/opt/"
 }
 
 data "aws_region" "current" {}

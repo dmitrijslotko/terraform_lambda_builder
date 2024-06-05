@@ -48,4 +48,3 @@ exports.handler = async () => {
   }
 };
 
-this.handler();

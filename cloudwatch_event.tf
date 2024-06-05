@@ -1,13 +1,23 @@
 resource "aws_cloudwatch_event_rule" "rule" {
-  count               = local.cw_rule ? 1 : 0
-  name                = var.function_name
-  schedule_expression = var.cw_event_cron_expression
-  is_enabled          = var.cw_event_is_enabled
+  count               = var.cron_config == null ? 0 : 1
+  schedule_expression = var.cron_config.cron_expression
+  state               = var.cron_config.enabled
+  name                = var.config.function_name
 }
 
 resource "aws_cloudwatch_event_target" "target" {
-  count = local.cw_rule ? 1 : 0
+  count = var.cron_config == null ? 0 : 1
   rule  = aws_cloudwatch_event_rule.rule[0].name
   arn   = local.arn
-  input = var.cw_event_input
+  input = var.cron_config.input
+}
+
+resource "aws_lambda_permission" "cw_permissions" {
+  count         = var.cron_config == null ? 0 : 1
+  statement_id  = "cloudwatch_permissions"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  qualifier     = local.lambda_function_qualifier
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.rule[0].arn
 }
