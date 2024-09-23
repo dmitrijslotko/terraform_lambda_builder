@@ -5,6 +5,7 @@ resource "aws_s3_object" "lambda_source" {
   key    = var.s3_source_config.key
   source = data.archive_file.archive[0].output_path
   etag   = data.archive_file.archive[0].output_base64sha256
+  tags   = var.config.tags
 }
 
 data "archive_file" "archive" {

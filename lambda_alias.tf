@@ -17,7 +17,7 @@ resource "null_resource" "clean_old_versions" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "python node clean_old_lambda_versions.js  ${var.config.function_name} ${var.alias_config.versions_to_keep}"
+    command     = "python clean_old_lambda_versions.py ${var.config.function_name} ${var.alias_config.versions_to_keep}"
   }
 
   depends_on = [

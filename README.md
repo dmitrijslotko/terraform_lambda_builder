@@ -51,13 +51,25 @@ To pull module using SSH key. Does not work with Gitlab pipeline.
 
 ```hcl
 module "lambda_function" {
-  source = "source = "github.com/dmitrijslotko/terraform_lambda_builder?ref=vX.X.X"
+  source = "git@gitlab.com:1nce-tech/data-analytics/terraform_lambda_builder?ref=x.x.x"
 
   # ... other variables ...
 }
 ```
 
 ### Example 2
+
+To pull module using HTTPS. Works with Gitlab pipeline.
+
+```hcl
+module "lambda_function" {
+  source = "git::https://gitlab.com/1nce-tech/data-analytics/terraform_lambda_builder.git?ref=x.x.x"
+
+  # ... other variables ...
+}
+```
+
+### Example 3
 
 ```
    root_directory/
@@ -278,6 +290,7 @@ The `docker_config` variable allows you to specify the Docker configuration for 
 - `image_tag_mutability` (optional, string): The mutability of the image tag for the Lambda function's container image. The default value is "MUTABLE". Possible values are "MUTABLE" and "IMMUTABLE".
 - `platform` (optional, string): The platform architecture for the Lambda function's container image. The default value is "arm64". Possible values: "arm64" and "x86_64". This field is used to specify the CPU architecture for the Docker image and the lambda function.
 - `os` (optional, string): The operating system for the Lambda function's container image. The default value is "linux". This field is used to specify the operating system for the Docker image.
+- `force_delete` optional(bool, false). Delete ecr repository if it was not empty.
 
 - **Note**: you must have instaled docker and laucnhed docker agent to be able to build images locally.
 
@@ -558,7 +571,7 @@ By using DynamoDB streams as an event source for Lambda, you can process changes
 - `bisect_batch_on_function_error`: An optional boolean that indicates whether to split a batch when one or more records in the batch result in a function error. The default value is false.
 - **`dynamo_stream_arn`**: A required string that specifies the ARN of the DynamoDB Stream to use as the event source for the Lambda function.
 - `enabled`: An optional boolean that indicates whether the event source mapping is enabled. The default value is true.
-- `filter_criteria_pattern`: An optional string that specifies a filter pattern for the stream records. The default value is null.
+- `filter_criteria_patterns`: An optional list of string that specifies a filter patterns for the stream records. The default value is null.
 - `function_response_types`: An optional list of strings that specifies the types of function responses to include in the event. The default value is null.
 - `maximum_batching_window_in_seconds`: An optional number that specifies the maximum amount of time to gather records before invoking the function. The default value is 0.
 - `maximum_record_age_in_seconds`: An optional number that specifies the maximum age of a record in the stream in seconds. The default value is 604800 (7 days).
@@ -591,11 +604,13 @@ module "lambda_function" {
 
   dynamo_event_trigger = {
      dynamo_stream_arn = "arn:aws:dynamodb:us-west-2:111111111111:table/table_name/stream/date"
-    filter_criteria_pattern = jsonencode({
-      "eventName" : [
-        "REMOVE"
-      ]
-    })
+    filter_criteria_patterns = [
+      jsonencode({
+        "eventName" : [
+          "REMOVE"
+        ]
+      })
+    ]
   }
 }
 ```

@@ -10,12 +10,13 @@ resource "aws_lambda_function" "lambda" {
   layers            = var.config.layers
   package_type      = var.docker_config != null ? "Image" : "Zip"
   memory_size       = var.config.memory_size
-  image_uri         = var.docker_config != null ? var.docker_config.repository_url == null ? "${aws_ecr_repository.repo[0].repository_url}:latest" : null : null
+  image_uri         = var.docker_config != null ? var.docker_config.repository_url == null ? "${aws_ecr_repository.repo[0].repository_url}:latest" : var.docker_config.repository_url : null
   publish           = var.config.publish || var.alias_config != null
   s3_bucket         = var.s3_source_config != null ? var.s3_source_config.bucket : null
   s3_key            = var.s3_source_config != null ? var.s3_source_config.key : null
   s3_object_version = var.s3_source_config != null ? var.s3_source_config.object_version : null
   architectures     = var.docker_config != null ? [var.docker_config.platform] : [var.config.architecture]
+  tags              = var.config.tags
   ephemeral_storage {
     size = var.config.ephemeral_storage
   }
@@ -62,10 +63,11 @@ resource "aws_cloudwatch_log_group" "log" {
   count             = var.log_group_config == null ? 0 : 1
   name              = "/aws/lambda/${var.config.function_name}"
   retention_in_days = var.log_group_config.retention_in_days
+  tags              = var.config.tags
 }
 
 resource "null_resource" "deploy_docker_image" {
-  count = var.docker_config == null ? 0 : 1
+  count = try(var.docker_config.create_repository, false) ? 1 : 0
 
   triggers = {
     always_run = timestamp()

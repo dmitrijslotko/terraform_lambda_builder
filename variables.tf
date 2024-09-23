@@ -5,9 +5,9 @@ variable "config" {
     description           = optional(string, "created by a lambda builder"),
     timeout               = optional(number, 30),
     memory_size           = optional(number, 128),
-    handler               = optional(string, "index.handler"),
+    handler               = optional(string, "main.handler"),
     layers                = optional(list(string), null),
-    runtime               = optional(string, "nodejs20.x"),
+    runtime               = optional(string, "python3.12"),
     environment_variables = optional(map(string), null),
     architecture          = optional(string, "arm64"),
     role_arn              = optional(string, null),
@@ -15,6 +15,7 @@ variable "config" {
     publish               = optional(bool, false),
     force_deploy          = optional(bool, false),
     role_policy           = optional(string, null),
+    tags                  = optional(map(string), null),
   })
 
   validation {
@@ -71,11 +72,13 @@ variable "log_group_config" {
 
 variable "docker_config" {
   type = object({
+    create_repository    = optional(bool, false)
     repository_url       = optional(string, null)
-    dockerfile_path      = string
+    dockerfile_path      = optional(string, null)
     image_tag_mutability = optional(string, "MUTABLE")
     platform             = optional(string, "arm64")
     os                   = optional(string, "linux")
+    force_delete         = optional(bool, false)
   })
   default = null
 }
@@ -276,8 +279,16 @@ variable "dynamo_event_trigger" {
     starting_position_timestamp        = optional(string, null),
     tumbling_window_in_seconds         = optional(number, 0),
     filter_criteria_pattern            = optional(string, null),
+    filter_criteria_patterns           = optional(list(string), null),
   })
   default = null
+  validation {
+    condition     = try(var.dynamo_event_trigger.filter_criteria_pattern, null) == null
+    error_message = <<ERR
+      Filter `filter_criteria_pattern` has been changed to `filter_criteria_patterns`.
+      Type changed to list(string) to support multiple patterns
+    ERR
+  }
 }
 
 variable "dynamo_target_config" {

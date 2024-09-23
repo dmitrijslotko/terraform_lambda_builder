@@ -3,6 +3,7 @@ resource "aws_cloudwatch_event_rule" "rule" {
   schedule_expression = var.cron_config.cron_expression
   state               = var.cron_config.enabled
   name                = var.config.function_name
+  tags                = var.config.tags
 }
 
 resource "aws_cloudwatch_event_target" "target" {

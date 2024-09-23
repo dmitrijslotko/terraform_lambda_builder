@@ -1,8 +1,9 @@
 resource "aws_efs_file_system" "efs_for_lambda" {
   count = var.efs_config == null ? 0 : 1
-  tags = {
+
+  tags = merge(var.config.tags, {
     Name = try("${var.config.function_name}_efs", var.efs_config.name)
-  }
+  })
 }
 
 resource "aws_efs_access_point" "access_point_for_lambda" {
@@ -24,9 +25,9 @@ resource "aws_efs_access_point" "access_point_for_lambda" {
     uid = 1000
   }
 
-  tags = {
+  tags = merge(var.config.tags, {
     Name = try("${var.config.function_name}_efs", var.efs_config.name)
-  }
+  })
 }
 
 resource "aws_efs_mount_target" "mount_target" {

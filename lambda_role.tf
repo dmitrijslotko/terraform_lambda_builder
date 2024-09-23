@@ -1,6 +1,7 @@
 resource "aws_iam_role" "lambda_builder_iam_role" {
   count = var.config.role_arn == null ? 1 : 0
   name  = var.config.function_name
+  tags  = var.config.tags
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -56,6 +57,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
 
       policy = jsonencode(
         {
+          "Version" : "2012-10-17",
           "Statement" : [{
             "Action" : [
               "logs:CreateLogStream",

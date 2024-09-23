@@ -9,6 +9,7 @@ resource "aws_cloudwatch_metric_alarm" "anomaly_detection" {
   datapoints_to_alarm = var.alarm_config.datapoints_to_alarm
   evaluation_periods  = var.alarm_config.evaluation_periods
   actions_enabled     = var.alarm_config.actions_enabled
+  tags                = var.config.tags
 
   metric_query {
     id = "m1"
@@ -104,6 +105,8 @@ resource "aws_cloudwatch_metric_alarm" "error_detection" {
   datapoints_to_alarm = var.alarm_config.datapoints_to_alarm
   evaluation_periods  = var.alarm_config.evaluation_periods
   actions_enabled     = var.alarm_config.actions_enabled
+  tags                = var.config.tags
+
 
   metric_query {
     id = "m1"
@@ -148,6 +151,8 @@ resource "aws_cloudwatch_metric_alarm" "daily_check" {
   treat_missing_data  = "breaching"
   alarm_actions       = var.alarm_config.sns_topic_arn == null ? var.alarm_config.alarm_actions : [var.alarm_config.sns_topic_arn]
   ok_actions          = var.alarm_config.sns_topic_arn == null ? var.alarm_config.ok_actions : [var.alarm_config.sns_topic_arn]
+  tags                = var.config.tags
+
 
   metric_query {
     id = "m1"
@@ -199,6 +204,8 @@ resource "aws_cloudwatch_metric_alarm" "custom" {
   period              = var.alarm_config.period
   threshold_metric_id = var.alarm_config.threshold_metric_id
   dimensions          = var.alarm_config.dimensions
+  tags                = var.config.tags
+
   dynamic "metric_query" {
     for_each = var.alarm_config.metric_query == null ? [] : var.alarm_config.metric_query
     content {
