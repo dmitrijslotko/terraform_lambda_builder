@@ -1,21 +1,23 @@
 variable "config" {
   type = object({
-    filename              = optional(string, null),
-    function_name         = string
-    description           = optional(string, "created by a lambda builder"),
-    timeout               = optional(number, 30),
-    memory_size           = optional(number, 128),
-    handler               = optional(string, "main.handler"),
-    layers                = optional(list(string), null),
-    runtime               = optional(string, "python3.12"),
-    environment_variables = optional(map(string), null),
-    architecture          = optional(string, "arm64"),
-    role_arn              = optional(string, null),
-    ephemeral_storage     = optional(number, 512),
-    publish               = optional(bool, false),
-    force_deploy          = optional(bool, false),
-    role_policy           = optional(string, null),
-    tags                  = optional(map(string), null),
+    filename               = optional(string, null),
+    function_name          = string
+    description            = optional(string, "created by a lambda builder"),
+    timeout                = optional(number, 30),
+    memory_size            = optional(number, 128),
+    handler                = optional(string, "main.handler"),
+    layers                 = optional(list(string), null),
+    runtime                = optional(string, "python3.12"),
+    environment_variables  = optional(map(string), null),
+    architecture           = optional(string, "arm64"),
+    role_arn               = optional(string, null),
+    ephemeral_storage      = optional(number, 512),
+    publish                = optional(bool, false),
+    force_deploy           = optional(bool, false),
+    role_policy            = optional(string, null),
+    lambda_kms_key_arn     = optional(string, null),
+    cloudwatch_kms_key_arn = optional(string, null),
+    tags                   = optional(map(string), null),
   })
 
   validation {
@@ -41,6 +43,16 @@ variable "config" {
   validation {
     condition     = var.config.architecture == "arm64" || var.config.architecture == "x86_64"
     error_message = "Architecture should be either arm64 or x86_64."
+  }
+
+  validation {
+    condition     = var.config.lambda_kms_key_arn == null || can(regex("^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$", var.config.lambda_kms_key_arn))
+    error_message = "Provided lambda function KMS key ARN should match regex pattern: ^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$"
+  }
+
+  validation {
+    condition     = var.config.cloudwatch_kms_key_arn == null || can(regex("^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$", var.config.cloudwatch_kms_key_arn))
+    error_message = "Provided cloudwatch KMS key ARN should match regex pattern: ^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$"
   }
 }
 
