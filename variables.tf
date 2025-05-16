@@ -1,23 +1,21 @@
 variable "config" {
   type = object({
-    filename               = optional(string, null),
-    function_name          = string
-    description            = optional(string, "created by a lambda builder"),
-    timeout                = optional(number, 30),
-    memory_size            = optional(number, 128),
-    handler                = optional(string, "main.handler"),
-    layers                 = optional(list(string), null),
-    runtime                = optional(string, "python3.12"),
-    environment_variables  = optional(map(string), null),
-    architecture           = optional(string, "arm64"),
-    role_arn               = optional(string, null),
-    ephemeral_storage      = optional(number, 512),
-    publish                = optional(bool, false),
-    force_deploy           = optional(bool, false),
-    role_policy            = optional(string, null),
-    lambda_kms_key_arn     = optional(string, null),
-    cloudwatch_kms_key_arn = optional(string, null),
-    tags                   = optional(map(string), null),
+    filename              = optional(string, null),
+    function_name         = string
+    description           = optional(string, "created by a lambda builder"),
+    timeout               = optional(number, 10),
+    memory_size           = optional(number, 128),
+    handler               = optional(string, "index.handler"),
+    layers                = optional(list(string), null),
+    runtime               = optional(string, "nodejs22.x"),
+    environment_variables = optional(map(string), null),
+    architecture          = optional(string, "arm64"),
+    role_arn              = optional(string, null),
+    ephemeral_storage     = optional(number, 512),
+    publish               = optional(bool, false),
+    force_deploy          = optional(bool, false),
+    role_policy           = optional(string, null),
+    tags                  = optional(map(string), null),
   })
 
   validation {
