@@ -42,16 +42,6 @@ variable "config" {
     condition     = var.config.architecture == "arm64" || var.config.architecture == "x86_64"
     error_message = "Architecture should be either arm64 or x86_64."
   }
-
-  validation {
-    condition     = var.config.lambda_kms_key_arn == null || can(regex("^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$", var.config.lambda_kms_key_arn))
-    error_message = "Provided lambda function KMS key ARN should match regex pattern: ^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$"
-  }
-
-  validation {
-    condition     = var.config.cloudwatch_kms_key_arn == null || can(regex("^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$", var.config.cloudwatch_kms_key_arn))
-    error_message = "Provided cloudwatch KMS key ARN should match regex pattern: ^arn:aws:kms:[a-z0-9-]+:\\d+:key/.*$"
-  }
 }
 
 variable "vpc_config" {

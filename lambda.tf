@@ -16,7 +16,6 @@ resource "aws_lambda_function" "lambda" {
   s3_key            = var.s3_source_config != null ? var.s3_source_config.key : null
   s3_object_version = var.s3_source_config != null ? var.s3_source_config.object_version : null
   architectures     = var.docker_config != null ? [var.docker_config.platform] : [var.config.architecture]
-  kms_key_arn       = var.config.lambda_kms_key_arn
   tags              = var.config.tags
   ephemeral_storage {
     size = var.config.ephemeral_storage
@@ -65,7 +64,6 @@ resource "aws_cloudwatch_log_group" "log" {
   name              = "/aws/lambda/${var.config.function_name}"
   retention_in_days = var.log_group_config.retention_in_days
   tags              = var.config.tags
-  kms_key_id        = var.config.cloudwatch_kms_key_arn
 }
 
 resource "null_resource" "deploy_docker_image" {
