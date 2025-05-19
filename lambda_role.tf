@@ -28,6 +28,27 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   }
 
   dynamic "inline_policy" {
+    for_each = var.secrets_manager_usage_permission == null ? [] : ["a single element to trigger the block"]
+    content {
+      name = "secrets_manager_access"
+
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "secretsmanager:GetSecretValue",
+              ],
+              "Resource" : var.secrets_manager_usage_permission.secret_arn
+            }
+          ]
+      })
+    }
+  }
+
+  dynamic "inline_policy" {
     for_each = var.dynamo_event_trigger == null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "dynamodb_access_execution_role"

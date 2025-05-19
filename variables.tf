@@ -335,3 +335,14 @@ variable "firehose_target_config" {
   })
   default = null
 }
+
+variable "secrets_manager_usage_permission" {
+  type = object({
+    secret_arn = string
+  })
+  default = null
+  validation {
+    condition     = try(var.secrets_manager_usage_permission.secret_arn != null, true)
+    error_message = "The secret_arn should not be null."
+  }
+}
