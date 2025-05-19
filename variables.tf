@@ -346,3 +346,14 @@ variable "secrets_manager_usage_permission" {
     error_message = "The secret_arn should not be null."
   }
 }
+
+variable "dynamodb_usage_permission" {
+  type = object({
+    table_arn = string
+  })
+  default = null
+  validation {
+    condition     = try(var.dynamodb_usage_permission.table_arn != null, true)
+    error_message = "The table_arn should not be null."
+  }
+}

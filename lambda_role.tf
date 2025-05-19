@@ -72,6 +72,37 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
   }
 
   dynamic "inline_policy" {
+    for_each = var.dynamodb_usage_permission == null ? [] : ["a single element to trigger the block"]
+    content {
+      name = "dynamodb_access"
+
+      policy = jsonencode(
+        {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Effect" : "Allow",
+              "Action" : [
+                "dynamodb:DescribeTable",
+                "dynamodb:ListTables",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+              ],
+              "Resource" : var.dynamodb_usage_permission.dynamo_arn
+            }
+          ]
+      })
+    }
+
+  }
+
+  dynamic "inline_policy" {
     for_each = var.log_group_config == null ? [] : ["a sigle element to trigger the block"]
     content {
       name = "cloudwatch_logs"
