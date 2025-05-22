@@ -93,6 +93,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
                 "dynamodb:DeleteItem",
                 "dynamodb:BatchGetItem",
                 "dynamodb:BatchWriteItem",
+                "dynamodb:Query",
               ],
               "Resource" : var.dynamodb_usage_permission.table_arn
             }
