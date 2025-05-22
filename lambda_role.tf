@@ -94,7 +94,7 @@ resource "aws_iam_role" "lambda_builder_iam_role" {
                 "dynamodb:BatchGetItem",
                 "dynamodb:BatchWriteItem",
               ],
-              "Resource" : var.dynamodb_usage_permission.dynamo_arn
+              "Resource" : var.dynamodb_usage_permission.table_arn
             }
           ]
       })
